@@ -1,0 +1,22 @@
+{
+    "name": "zadorin/php-airtable",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Eugene Zadorin",
+            "email": "mail@eugenezadorin.ru"
+        }
+    ],
+    "require": {
+        "php": "^7.4"
+    },
+    "require-dev": {
+        "pestphp/pest": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Zadorin\\": "src"
+        }
+    }
+}
