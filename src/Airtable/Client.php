@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
+use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Query\SelectQuery;
+use Zadorin\Airtable\Query\InsertQuery;
 
 class Client
 {
@@ -20,11 +22,6 @@ class Client
     {
         $this->apiKey = $apiKey;
         $this->databaseName = $databaseName;
-    }
-
-    public function query(): Query
-    {
-        return new Query($this);
     }
 
     public function table(string $tableName): self
@@ -45,18 +42,15 @@ class Client
         return $query;
     }
 
-    // @todo: replace params and return types with DTO
-    /*public function insert(array $fields): array
+    public function insert(Record ...$records): InsertQuery
     {
-        return $this->call('POST', '', [
-            'records' => [
-                [
-                    'fields' => $fields
-                ]
-            ]
-        ]);
+        $query = new InsertQuery($this);
+        $query->insert(...$records);
+
+        return $query;
     }
 
+    /*
     public function update(string $recordId, array $fields): array
     {
         return $this->call('PATCH', '', [
@@ -78,10 +72,15 @@ class Client
             'Content-Type' => 'application/json',
         ];
         $headers = array_merge($defaultHeaders, $headers);
+        $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+        if (!in_array($method, $allowedMethods)) {
+            throw new Errors\MethodNotAllowed('Request method not allowed');
+        }
 
         $handler = curl_init($uri);
         curl_setopt($handler, CURLOPT_HTTPHEADER, $this->curlHeaders($headers));
         curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handler, CURLOPT_CUSTOMREQUEST, $method);
 
         if (!empty($data)) {
             curl_setopt($handler, CURLOPT_POSTFIELDS, json_encode($data));
