@@ -89,7 +89,6 @@ class Client
         return $this->call('GET', '?' . http_build_query($urlParams));
     }
 
-    // @todo: add json and curl as composer dependencies
     protected function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
     {
         $baseUri = sprintf('%s/%s/%s', self::BASE_URL, $this->databaseName, $this->tableName);

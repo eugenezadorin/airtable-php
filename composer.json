@@ -1,5 +1,6 @@
 {
-    "name": "zadorin/php-airtable",
+    "name": "zadorin/airtable-php",
+    "description": "Simple PHP wrapper for Airtable API",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -9,7 +10,9 @@
         }
     ],
     "require": {
-        "php": "^7.4"
+        "php": "^7.4",
+        "ext-curl": "*",
+        "ext-json": "*"
     },
     "require-dev": {
         "pestphp/pest": "^1.0"
