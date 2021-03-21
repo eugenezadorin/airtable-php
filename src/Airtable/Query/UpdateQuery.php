@@ -8,11 +8,11 @@ use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Record;
 use Zadorin\Airtable\Recordset;
 
-class InsertQuery extends AbstractQuery
+class UpdateQuery extends AbstractQuery
 {
     protected array $records = [];
 
-    public function insert(Record ...$records): self
+    public function update(Record ...$records): self
     {
         $this->records = $records;
         return $this;
@@ -27,9 +27,10 @@ class InsertQuery extends AbstractQuery
         $data = ['records' => []];
         foreach ($this->records as $record) {
             $data['records'][] = [
+                'id' => $record->getId(),
                 'fields' => $record->getFields()
             ];
         }
-        return $this->client->call('POST', '', $data);
+        return $this->client->call('PATCH', '', $data);
     }
 }

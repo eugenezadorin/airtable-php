@@ -7,6 +7,7 @@ namespace Zadorin\Airtable;
 use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Query\SelectQuery;
 use Zadorin\Airtable\Query\InsertQuery;
+use Zadorin\Airtable\Query\UpdateQuery;
 
 class Client
 {
@@ -50,18 +51,13 @@ class Client
         return $query;
     }
 
-    /*
-    public function update(string $recordId, array $fields): array
+    public function update(Record ...$records): UpdateQuery
     {
-        return $this->call('PATCH', '', [
-            'records' => [
-                [
-                    'id' => $recordId,
-                    'fields' => $fields
-                ]
-            ]
-        ]);
-    }*/
+        $query = new UpdateQuery($this);
+        $query->update(...$records);
+
+        return $query;
+    }
 
     public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
     {
