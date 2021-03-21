@@ -5,9 +5,8 @@ declare(strict_types=1);
 use Zadorin\Airtable\Errors\RequestError;
 
 it('can fetch simple data without any filtration', function () {
-    $actual = client()->query()
+    $actual = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->limit(2)
         ->execute();
 
@@ -20,9 +19,8 @@ it('can fetch simple data without any filtration', function () {
 });
 
 it('fetches all rows and columns if we not specify limits', function () {
-    $actual = client()->query()
+    $actual = client()->table('simple_selections')
         ->select()
-        ->from('simple_selections')
         ->execute();
 
     $expected = [
@@ -35,9 +33,8 @@ it('fetches all rows and columns if we not specify limits', function () {
 });
 
 it('allows to use * wildcard to select all fields', function () {
-    $actual = client()->query()
+    $actual = client()->table('simple_selections')
         ->select('*')
-        ->from('simple_selections')
         ->execute();
 
     $expected = [
@@ -50,16 +47,14 @@ it('allows to use * wildcard to select all fields', function () {
 });
 
 it('fails on unknown fields', function () {
-    client()->query()
+    client()->table('simple_selections')
         ->select('Name', 'absolutely_unknown')
-        ->from('simple_selections')
         ->execute();
 })->throws(RequestError::class);
 
 it('supports zero-limit', function () {
-    $recordset = client()->query()
+    $recordset = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->where(['Value' => 'Bar'])
         ->limit(-1)
         ->execute();

@@ -5,9 +5,8 @@ declare(strict_types=1);
 use Zadorin\Airtable\Record;
 
 it('can fetch records collection', function () {
-    $recordset = client()->query()
+    $recordset = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->where(['Value' => 'Bar'])
         ->limit(2)
         ->execute();
@@ -24,9 +23,8 @@ it('can fetch records collection', function () {
 });
 
 it('can iterate through records', function () {
-    $recordset = client()->query()
+    $recordset = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->where(['Value' => 'Bar'])
         ->limit(2)
         ->execute();
@@ -45,9 +43,8 @@ it('can iterate through records', function () {
 });
 
 it('properly works with empty recordset', function () {
-    $recordset = client()->query()
+    $recordset = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->where(['Value' => 'Definitely Not Exists'])
         ->limit(2)
         ->execute();

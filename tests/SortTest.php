@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 it('can sort by one field', function () {
-    $actual = client()->query()
+    $actual = client()->table('sorting')
         ->select()
-        ->from('sorting')
         ->orderBy(['col1' => 'desc'])
         ->execute();
 
@@ -19,9 +18,8 @@ it('can sort by one field', function () {
 });
 
 it('can sort by multiple fields', function () {
-    $actual = client()->query()
+    $actual = client()->table('sorting')
         ->select()
-        ->from('sorting')
         ->orderBy(['col2' => 'asc', 'col3' => 'desc'])
         ->execute();
 

@@ -3,9 +3,8 @@
 declare(strict_types=1);
 
 it('can filter records by single criteria', function () {
-    $actual = client()->query()
+    $actual = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->where(['Value' => 'Bar'])
         ->execute();
 
@@ -18,9 +17,8 @@ it('can filter records by single criteria', function () {
 });
 
 it('can filter records by multiple criteria', function () {
-    $actual = client()->query()
+    $actual = client()->table('simple_selections')
         ->select('Name', 'Value')
-        ->from('simple_selections')
         ->where(['Value' => 'Bar', 'Name' => 'Foo'])
         ->execute();
 

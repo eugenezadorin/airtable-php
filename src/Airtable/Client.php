@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
+use Zadorin\Airtable\Query\SelectQuery;
+
 class Client
 {
     public const BASE_URL = 'https://api.airtable.com/v0';
@@ -23,6 +25,24 @@ class Client
     public function query(): Query
     {
         return new Query($this);
+    }
+
+    public function table(string $tableName): self
+    {
+        $this->tableName = $tableName;
+        return $this;
+    }
+
+    public function getTable(): string
+    {
+        return $this->tableName;
+    }
+
+    public function select(string ...$fields): SelectQuery
+    {
+        $query = new SelectQuery($this);
+        $query->select(...$fields);
+        return $query;
     }
 
     // @todo: replace params and return types with DTO
@@ -49,47 +69,7 @@ class Client
         ]);
     }*/
 
-    public function execute(Query $query): Recordset
-    {
-        if (!$query->tableName) {
-            throw new Errors\TableNotSpecified('Table name must be specified');
-        }
-
-        $this->tableName = $query->tableName;
-
-        $urlParams = [];
-
-        if (count($query->selectFields) > 0) {
-            $urlParams['fields'] = $query->selectFields;
-        }
-
-        if (count($query->filterConditions) > 0) {
-            $formulas = [];
-            // @todo: each condition should be object of Condition class
-            foreach ($query->filterConditions as $field => $value) {
-                $formulas[] = sprintf("{%s}='%s'", $field, $value);
-            }
-
-            $urlParams['filterByFormula'] = 'AND(' . implode(', ', $formulas) . ')';
-        }
-
-        if (count($query->orderConditions) > 0) {
-            foreach ($query->orderConditions as $field => $direction) {
-                $urlParams['sort'][] = ['field' => $field, 'direction' => $direction];
-            }
-        }
-
-        if ($query->limit > 0) {
-            $key = $query->limit <= 100 ? 'pageSize' : 'maxRecords';
-            $urlParams[$key] = $query->limit;
-        } else {
-            $urlParams['pageSize'] = 0;
-        }
-
-        return $this->call('GET', '?' . http_build_query($urlParams));
-    }
-
-    protected function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
+    public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
     {
         $baseUri = sprintf('%s/%s/%s', self::BASE_URL, $this->databaseName, $this->tableName);
         $uri = $baseUri . $uri;
