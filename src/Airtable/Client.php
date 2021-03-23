@@ -8,6 +8,9 @@ use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Query\SelectQuery;
 use Zadorin\Airtable\Query\InsertQuery;
 use Zadorin\Airtable\Query\UpdateQuery;
+use Zadorin\Airtable\Query\DeleteQuery;
+
+use \Closure;
 
 class Client
 {
@@ -55,6 +58,14 @@ class Client
     {
         $query = new UpdateQuery($this);
         $query->update(...$records);
+
+        return $query;
+    }
+
+    public function delete(Record ...$records): DeleteQuery
+    {
+        $query = new DeleteQuery($this);
+        $query->delete(...$records);
 
         return $query;
     }

@@ -40,13 +40,22 @@ while ($record = $recordset->fetch()) {
     $record->setFields(['name' => 'Ivan the 1st']);
     $client->table($tableName)->update($record);
 }
+
+// remove rows
+$records = $client->table($tableName)
+    ->select('id', 'email')
+    ->where(['email' => 'peter@test.tld'])
+    ->execute()
+    ->fetchAll();
+
+$client->delete(...$records)->execute();
 ```
 
 ## ToDo
 
-[ ] Insert and update both arrays and records
+[ ] Insert/update/delete both arrays and records
 
-[ ] Delete records
+[x] Delete records
 
 [ ] Pagination
 
