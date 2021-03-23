@@ -16,28 +16,28 @@ $client = \Zadorin\Airtable\Client($apiKey, $database);
 // insert some rows
 $client->table($tableName)
     ->insert([
-        ['name' => 'foo', 'value' => 'bar'],
-        ['name' => 'baz', 'value' => 'qux']
+        ['name' => 'Ivan', 'email' => 'ivan@test.tld'],
+        ['name' => 'Peter', 'email' => 'peter@test.tld']
     ])
     ->execute();
 
 // fetch data
 $recordset = $client->table($tableName)
-    ->select('id', 'name', 'value')
-    ->where(['name' => 'foo', 'value' => 'bar'])
+    ->select('id', 'name', 'email')
+    ->where(['name' => 'Ivan', 'email' => 'ivan@test.tld'])
     ->orderBy(['id' => 'desc'])
     ->limit(10)
     ->execute();
 
-var_dump($recordset->fetchAll());
-var_dump($recordset->asArray());
+var_dump($recordset->fetchAll()); // returns set of Record objects
+var_dump($recordset->asArray()); // returns array of arrays
 
 // iterate and update
 while ($record = $recordset->fetch()) {
     var_dump($record->getId()); // rec**********
-    var_dump($record->getFields()); // [id => 1, name => foo, value => bar]
+    var_dump($record->getFields()); // [id => 1, name => Ivan, email => ivan@test.tld]
 
-    $record->setFields(['name' => 'New Name']);
+    $record->setFields(['name' => 'Ivan the 1st']);
     $client->table($tableName)->update($record);
 }
 ```
@@ -45,8 +45,11 @@ while ($record = $recordset->fetch()) {
 ## ToDo
 
 [ ] Insert and update both arrays and records
+
 [ ] Delete records
+
 [ ] Pagination
+
 [ ] Complex filter expressions
 
 ## Tests
