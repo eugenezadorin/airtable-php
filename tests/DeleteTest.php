@@ -60,3 +60,23 @@ it('cannot remove record without specific record id', function() {
         ->delete(new Record(['timestamp' => 100]))
         ->execute();
 })->throws(RequestError::class);
+
+it('can remove records by string ids', function () {
+    $client = client()->table('removing');
+
+    $inserted = $client
+        ->insert(new Record(['timestamp' => 500]), new Record(['timestamp' => 600]))
+        ->execute()
+        ->fetchAll();
+
+    $insertedIds = array_map(fn($record) => $record->getId(), $inserted);
+
+    $removed = $client
+        ->delete(...$insertedIds)
+        ->execute()
+        ->fetchAll();
+
+    $removedIds = array_map(fn($record) => $record->getId(), $removed);
+
+    expect($removedIds)->toEqual($insertedIds);
+});

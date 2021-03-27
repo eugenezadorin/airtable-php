@@ -56,3 +56,31 @@ it('requires at least one record', function () {
         ->insert()
         ->execute();
 })->throws(Errors\RecordsNotSpecified::class);
+
+it('can use array instead of record object', function () {
+    $fields = [
+        'name' => 'Sarah',
+        'email' => 'sarah@test.tld',
+    ];
+
+    $recordset = client()->table('inserting')
+        ->insert($fields)
+        ->execute();
+
+    expect($recordset->fetch()->getFields())->toMatchArray($fields);
+});
+
+it('can insert several records at once by passing an array of arrays', function () {
+    $fields1 = ['name' => 'Jane', 'email' => 'jane@test.tld'];
+    $fields2 = ['name' => 'Katty', 'email' => 'katty@test.tld'];
+
+    $recordset = client()->table('inserting')
+        ->insert([$fields1, $fields2])
+        ->execute();
+
+    $added1 = $recordset->fetch()->getFields();
+    $added2 = $recordset->fetch()->getFields();
+
+    expect($added1)->toMatchArray($fields1);
+    expect($added2)->toMatchArray($fields2);
+});

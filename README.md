@@ -53,7 +53,7 @@ $client->delete(...$records)->execute();
 
 ## ToDo
 
-[ ] Insert/update/delete both arrays and records
+[x] Insert/update/delete both arrays and records
 
 [x] Delete records
 

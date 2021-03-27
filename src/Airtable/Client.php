@@ -10,8 +10,6 @@ use Zadorin\Airtable\Query\InsertQuery;
 use Zadorin\Airtable\Query\UpdateQuery;
 use Zadorin\Airtable\Query\DeleteQuery;
 
-use \Closure;
-
 class Client
 {
     public const BASE_URL = 'https://api.airtable.com/v0';
@@ -46,14 +44,23 @@ class Client
         return $query;
     }
 
-    public function insert(Record ...$records): InsertQuery
+    /**
+     * @var Record|array $args
+     * @return InsertQuery
+     */
+    public function insert(...$args): InsertQuery
     {
+        $records = ArgParser::makeRecordsFromFields(...$args);
         $query = new InsertQuery($this);
         $query->insert(...$records);
 
         return $query;
     }
 
+    /**
+     * @var Record $records
+     * @return UpdateQuery
+     */
     public function update(Record ...$records): UpdateQuery
     {
         $query = new UpdateQuery($this);
@@ -62,8 +69,13 @@ class Client
         return $query;
     }
 
-    public function delete(Record ...$records): DeleteQuery
+    /**
+     * @var Record|string $args
+     * @return DeleteQuery
+     */
+    public function delete(...$args): DeleteQuery
     {
+        $records = ArgParser::makeRecordsFromIds(...$args);
         $query = new DeleteQuery($this);
         $query->delete(...$records);
 
