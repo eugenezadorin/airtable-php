@@ -41,6 +41,16 @@ while ($record = $recordset->fetch()) {
     $client->table($tableName)->update($record);
 }
 
+// pagination
+$query = $client->table($tableName)
+    ->select('id')
+    ->orderBy(['id' => 'desc'])
+    ->paginate(50); // limit(50) works the same. Default (and maximal) page size is 100
+
+while ($recordset = $query->nextPage()) {
+    var_dump($recordset->fetchAll());
+}
+
 // remove rows
 $records = $client->table($tableName)
     ->select('id', 'email')
@@ -57,9 +67,15 @@ $client->delete(...$records)->execute();
 
 [x] Delete records
 
-[ ] Pagination
+[x] Pagination
+
+[ ] Request throttling
+
+[ ] Debug mode
 
 [ ] Complex filter expressions
+
+[ ] Simple joins
 
 ## Tests
 

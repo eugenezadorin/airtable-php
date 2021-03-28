@@ -8,6 +8,8 @@ class Recordset
 {
     protected array $records = [];
 
+    protected ?string $offset = null;
+
     public static function createFromResponse(array $apiResponse): self
     {
         if (!isset($apiResponse['records'])) {
@@ -20,6 +22,10 @@ class Recordset
             foreach ($apiResponse['records'] as $apiRecord) {
                 $recordset->records[] = Record::createFromResponse($apiRecord);
             }
+        }
+
+        if (isset($apiResponse['offset'])) {
+            $recordset->offset = $apiResponse['offset'];
         }
         
         return $recordset;
@@ -58,5 +64,10 @@ class Recordset
             $result[] = $record->getFields();
         }
         return $result;
+    }
+
+    public function getOffset(): ?string
+    {
+        return $this->offset;
     }
 }

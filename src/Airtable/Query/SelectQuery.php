@@ -4,15 +4,22 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable\Query;
 
+use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Recordset;
 
 class SelectQuery extends AbstractQuery
 {
+    public const MAX_PAGE_SIZE = 100;
+
     protected array $selectFields = [];
 
     protected array $filterConditions = [];
 
     protected array $orderConditions = [];
+
+    protected ?string $offset = null;
+
+    protected bool $hasNextPage = true;
 
     protected int $limit = 100;
 
@@ -40,14 +47,31 @@ class SelectQuery extends AbstractQuery
             }
         }
 
-        if ($this->limit > 0) {
-            $key = $this->limit <= 100 ? 'pageSize' : 'maxRecords';
-            $urlParams[$key] = $this->limit;
-        } else {
-            $urlParams['pageSize'] = 0;
+        $urlParams['pageSize'] = $this->limit > 0 ? $this->limit : 0;
+
+        if ($this->offset !== null) {
+            $urlParams['offset'] = $this->offset;
         }
 
         return $this->client->call('GET', '?' . http_build_query($urlParams));
+    }
+
+    public function nextPage(): ?Recordset
+    {
+        if ($this->hasNextPage) {
+            $recordset = $this->execute();
+            $this->offset = $recordset->getOffset();
+
+            if ($this->offset === null || $recordset->count() === 0) {
+                $this->hasNextPage = false;
+            }
+
+            if ($recordset->count() > 0) {
+                return $recordset;
+            }
+        }
+
+        return null;
     }
 
     public function select(string ...$fields): self
@@ -74,7 +98,15 @@ class SelectQuery extends AbstractQuery
 
     public function limit(int $limit): self
     {
+        if ($limit > self::MAX_PAGE_SIZE) {
+            throw new Errors\PageSizeTooLarge(sprintf('Max pagesize is %s, given %s', self::MAX_PAGE_SIZE, $limit));
+        }
         $this->limit = $limit;
         return $this;
+    }
+
+    public function paginate(int $pageCount): self
+    {
+        return $this->limit($pageCount);
     }
 }
