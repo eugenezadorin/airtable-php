@@ -61,6 +61,17 @@ $records = $client->table($tableName)
 $client->delete(...$records)->execute();
 ```
 
+## Throttling
+
+Airtable API is limited to 5 requests per second per base. Client uses simple throttling library to keep this limit.
+
+You can disable this behavior:
+
+```php
+$client = \Zadorin\Airtable\Client($apiKey, $database);
+$client->throttling(false);
+```
+
 ## ToDo
 
 [x] Insert/update/delete both arrays and records
@@ -69,7 +80,7 @@ $client->delete(...$records)->execute();
 
 [x] Pagination
 
-[ ] Request throttling
+[x] Request throttling
 
 [ ] Debug mode
 

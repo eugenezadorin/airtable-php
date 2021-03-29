@@ -12,7 +12,8 @@
     "require": {
         "php": "^7.4",
         "ext-curl": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "davedevelopment/stiphle": "^0.9.2"
     },
     "require-dev": {
         "pestphp/pest": "^1.0"

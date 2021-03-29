@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
+use Stiphle\Throttle;
 use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Query\SelectQuery;
 use Zadorin\Airtable\Query\InsertQuery;
@@ -14,11 +15,17 @@ class Client
 {
     public const BASE_URL = 'https://api.airtable.com/v0';
 
+    public const MAX_RPS = 5;
+
     protected string $apiKey = '';
 
     protected string $databaseName = '';
 
     protected string $tableName = '';
+
+    protected bool $throttling = true;
+
+    protected ?Throttle\ThrottleInterface $throttler = null;
 
     public function __construct(string $apiKey, string $databaseName)
     {
@@ -82,8 +89,20 @@ class Client
         return $query;
     }
 
+    public function throttling(?bool $throttling = null): bool
+    {
+        if ($throttling !== null) {
+            $this->throttling = $throttling;
+        }
+        return $this->throttling;
+    }
+
     public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
     {
+        if ($this->throttling) {
+            $this->throttle();
+        }
+
         $baseUri = sprintf('%s/%s/%s', self::BASE_URL, $this->databaseName, $this->tableName);
         $uri = $baseUri . $uri;
         $defaultHeaders = [
@@ -118,12 +137,22 @@ class Client
         );
     }
 
-    private function curlHeaders(array $headers): array
+    protected function curlHeaders(array $headers): array
     {
         $result = [];
         foreach ($headers as $key => $value) {
             $result[] = "$key: $value";
         }
         return $result;
+    }
+
+    protected function throttle()
+    {
+        if ($this->throttler === null) {
+            $this->throttler = new Throttle\LeakyBucket;
+        }
+        $requests = self::MAX_RPS;
+        $inOneSecond = 1000;
+        $this->throttler->throttle('Zadorin\\Airtable', $requests, $inOneSecond);
     }
 }
