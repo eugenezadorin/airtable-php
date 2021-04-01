@@ -8,23 +8,27 @@ class Request
 {
     protected string $method = 'GET';
 
-    protected string $uri;
+    protected string $uri = '';
 
+    /**
+     * @var array<string, string>
+     */
     protected array $requestHeaders = [];
 
-    protected string $requestBody;
+    protected string $requestBody = '';
 
     protected array $allowedMethods = [
         'GET', 'POST', 'PUT', 'PATCH', 'DELETE'
     ];
 
-    protected int $responseCode;
+    protected int $responseCode = 0;
 
-    protected string $responseBody;
+    protected string $responseBody = '';
 
     protected array $responseInfo = [];
 
-    protected $handler;
+    /** @var ?resource */
+    protected $handler = null;
 
     public function setMethod(string $method): self
     {
@@ -45,6 +49,9 @@ class Request
         return $this;
     }
 
+    /**
+     * @param array<string, string> $headers
+     */
     public function setHeaders(array $headers): self
     {
         $this->requestHeaders = $headers;
@@ -57,12 +64,18 @@ class Request
         return $this;
     }
 
+    /**
+     * @param mixed $fields
+     */
     public function setData($fields): self
     {
         $this->requestBody = json_encode($fields, JSON_THROW_ON_ERROR);
         return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function getData()
     {
         return json_decode($this->responseBody, true, 512, JSON_THROW_ON_ERROR);
@@ -91,7 +104,7 @@ class Request
         return false;
     }
 
-    public function send()
+    public function send(): string
     {
         $this->handler = curl_init($this->uri);
         curl_setopt($this->handler, CURLOPT_HTTPHEADER, $this->prepareCurlHeaders());
@@ -103,20 +116,28 @@ class Request
             curl_setopt($this->handler, CURLOPT_POSTFIELDS, $this->requestBody);
         }
 
-        $this->responseBody = curl_exec($this->handler);
+        $result = curl_exec($this->handler);
+        
+        /** @var array */
         $this->responseInfo = curl_getinfo($this->handler);
+        
         $this->responseCode = intval($this->responseInfo['http_code']);
         
-        if ($this->responseBody === false) {
+        if ($result === false) {
             $errorText = curl_error($this->handler);
             curl_close($this->handler);
             throw new Errors\RequestError($errorText, $this->responseCode);
+        } else {
+            $this->responseBody = (string)$result;
         }
 
         curl_close($this->handler);
         return $this->responseBody;
     }
 
+    /**
+     * @return string[]
+     */
     protected function prepareCurlHeaders(): array
     {
         $result = [];

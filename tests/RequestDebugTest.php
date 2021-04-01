@@ -15,14 +15,11 @@ it('fails on unexpected request methods', function () {
     $request->setMethod('HEAD');
 })->throws(Errors\MethodNotAllowed::class);
 
-it('can handle non-existent urls', function () {
+it('fails on non-existent urls', function () {
     $request = new Request();
     $request->setUri('http://definitely-not-exists.tld');
-    $result = $request->send();
-
-    expect($result)->toBeEmpty();
-    expect($request->isSuccess())->toBeFalse();
-});
+    $request->send();
+})->throws(Errors\RequestError::class);
 
 test('client keeps last request', function () {
     $client = client()->table('simple_selections');
