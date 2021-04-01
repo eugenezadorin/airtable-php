@@ -11,7 +11,7 @@ $apiKey = 'key***********';
 $database = 'app***********';
 $tableName = 'my-table';
 
-$client = \Zadorin\Airtable\Client($apiKey, $database);
+$client = new \Zadorin\Airtable\Client($apiKey, $database);
 
 // insert some rows
 $client->table($tableName)
@@ -68,8 +68,23 @@ Airtable API is limited to 5 requests per second per base. Client uses simple th
 You can disable this behavior:
 
 ```php
-$client = \Zadorin\Airtable\Client($apiKey, $database);
+$client = new \Zadorin\Airtable\Client($apiKey, $database);
 $client->throttling(false);
+```
+
+## Debug
+
+Client keeps last request object so you can use this for debugging purposes.
+
+**Be careful with debug information because it contains all HTTP headers including authorization token**
+
+```php
+$recordset = $client->table($tableName)->select('*')->execute();
+$request = $client->getLastRequest();
+
+$request->getResponseCode(); // http code (int)
+$request->getPlainResponse(); // response body (string)
+$request->getResponseInfo(); // array provided by curl_getinfo()
 ```
 
 ## ToDo
@@ -82,7 +97,15 @@ $client->throttling(false);
 
 [x] Request throttling
 
-[ ] Debug mode
+[x] Debug mode
+
+[ ] Improve exceptions inheritance
+
+[ ] Clean up code, static analyzis
+
+[ ] Upgrade to PHP8
+
+[ ] Expose test tables
 
 [ ] Complex filter expressions
 
