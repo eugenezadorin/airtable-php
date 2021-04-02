@@ -127,13 +127,19 @@ try {
 
 [x] Improve exceptions inheritance
 
-[ ] Clean up code
+[ ] Test on PHP8
 
-[ ] Upgrade to PHP8
+[ ] Improve readme (split examples)
+
+[ ] Set 0.0.1 tag
+
+[ ] Publish on packagist
 
 [ ] Complex filter expressions
 
 [ ] Simple joins
+
+[ ] Clean up code
 
 ## Tests
 
