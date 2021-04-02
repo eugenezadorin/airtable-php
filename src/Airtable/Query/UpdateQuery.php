@@ -10,6 +10,7 @@ use Zadorin\Airtable\Recordset;
 
 class UpdateQuery extends AbstractQuery
 {
+    /** @var Record[] */
     protected array $records = [];
 
     public function update(Record ...$records): self

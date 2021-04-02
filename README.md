@@ -99,13 +99,15 @@ $request->getResponseInfo(); // array provided by curl_getinfo()
 
 [x] Debug mode
 
+[x] Static analyzis
+
+[x] Expose test tables
+
 [ ] Improve exceptions inheritance
 
-[ ] Clean up code, static analyzis
+[ ] Clean up code
 
 [ ] Upgrade to PHP8
-
-[ ] Expose test tables
 
 [ ] Complex filter expressions
 
@@ -113,6 +115,12 @@ $request->getResponseInfo(); // array provided by curl_getinfo()
 
 ## Tests
 
-Fill env variables in `phpunit.xml.dist` and then run
+Copy this [readonly test database](https://airtable.com/shrs2bB37sScbDuLX) into your Airtable account.
+
+Then fill env variables specified in `phpunit.xml.dist`. 
+
+You can find `AIRTABLE_API_KEY` in your [account settings](https://airtable.com/account) and `AIRTABLE_TEST_DB` in [API Docs](https://airtable.com/api).
+
+And finally run test suite:
 
     ./vendor/bin/pest

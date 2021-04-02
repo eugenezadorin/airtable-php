@@ -6,6 +6,7 @@ namespace Zadorin\Airtable\Query;
 
 use Zadorin\Airtable\Client;
 use Zadorin\Airtable\Errors;
+use Zadorin\Airtable\Recordset;
 
 abstract class AbstractQuery
 {
@@ -14,10 +15,13 @@ abstract class AbstractQuery
     public function __construct(Client $client)
     {
         $this->client = $client;
-        if (!$this->client->getTable() === '') {
+        if ($this->client->getTable() === '') {
             throw new Errors\TableNotSpecified('Table name must be specified');
         }
     }
 
-    public abstract function execute();
+    /**
+     * @return Recordset
+     */
+    public abstract function execute(): Recordset;
 }

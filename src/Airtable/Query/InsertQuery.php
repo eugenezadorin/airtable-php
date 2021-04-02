@@ -10,6 +10,7 @@ use Zadorin\Airtable\Recordset;
 
 class InsertQuery extends AbstractQuery
 {
+    /** @var Record[] */
     protected array $records = [];
 
     public function insert(Record ...$records): self

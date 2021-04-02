@@ -9,31 +9,32 @@ use \InvalidArgumentException;
 class ArgParser
 {
     /**
-     * @var mixed $args
+     * @param mixed ...$args
      * @return Record[]
      * @throws InvalidArgumentException
      */
     public static function makeRecordsFromFields(...$args): array
     {
         $records = [];
+        
+        /** @var mixed $arg */
         foreach ($args as $arg) {
             if (is_array($arg)) {
-                
-                // we want allways work with array of arrays
-                $first = reset($arg);
-                if (!is_array($first) && !($first instanceof Record)) {
-                    $arg = [$arg];
+
+                if (self::isArrayOfArrays($arg)) {
+                    /** @var array $fields */
+                    foreach ($arg as $fields) {
+                        $records[] = new Record($fields);
+                    }
+                } elseif (self::isArrayOfRecords($arg)) {
+                    /** @var Record $record */
+                    foreach ($arg as $record) {
+                        $records[] = $record;
+                    }
+                } else {
+                    $records[] = new Record($arg);
                 }
 
-                foreach ($arg as $fields) {
-                    if (is_array($fields)) {
-                        $records[] = new Record($fields);
-                    } elseif ($fields instanceof Record) {
-                        $records[] = $fields;
-                    } else {
-                        throw new InvalidArgumentException('Only arrays or instances of Zadorin\Airtable\Record are allowed');
-                    }
-                }
             } elseif ($arg instanceof Record) {
                 $records[] = $arg;
             } else {
@@ -44,22 +45,56 @@ class ArgParser
     }
 
     /**
-     * @var mixed $args
+     * @param mixed ...$args
      * @return Record[]
      * @throws InvalidArgumentException
      */
     public static function makeRecordsFromIds(...$args): array
     {
         $records = [];
+
+        /** @var mixed $arg */
         foreach ($args as $arg) {
             if ($arg instanceof Record) {
                 $records[] = $arg;
             } elseif (is_string($arg)) {
                 $records[] = new Record([], $arg);
             } else {
-                throw new InvalidArgumentException('Only arrays or instances of Zadorin\Airtable\Record are allowed');
+                throw new InvalidArgumentException('Only record ids or instances of Zadorin\Airtable\Record are allowed');
             }
         }
         return $records;
+    }
+
+    /**
+     * @param mixed $var
+     * @return bool
+     */
+    protected static function isArrayOfArrays($var): bool
+    {
+        if (is_array($var) && count($var) > 0) {
+            /** @var mixed */
+            $first = reset($var);
+            if ($first && is_array($first)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param mixed $var
+     * @return bool
+     */
+    protected static function isArrayOfRecords($var): bool
+    {
+        if (is_array($var) && count($var) > 0) {
+            /** @var mixed */
+            $first = reset($var);
+            if ($first && $first instanceof Record) {
+                return true;
+            }
+        }
+        return false;
     }
 }

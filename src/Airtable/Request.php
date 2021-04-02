@@ -76,7 +76,7 @@ class Request
     /**
      * @return mixed
      */
-    public function getData()
+    public function getResponseData()
     {
         return json_decode($this->responseBody, true, 512, JSON_THROW_ON_ERROR);
     }

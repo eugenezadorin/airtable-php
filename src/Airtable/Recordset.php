@@ -6,6 +6,7 @@ namespace Zadorin\Airtable;
 
 class Recordset
 {
+    /** @var Record[] */
     protected array $records = [];
 
     protected ?string $offset = null;
@@ -19,13 +20,14 @@ class Recordset
         $recordset = new self();
 
         if (is_array($apiResponse['records'])) {
+            /** @var array $apiRecord */
             foreach ($apiResponse['records'] as $apiRecord) {
                 $recordset->records[] = Record::createFromResponse($apiRecord);
             }
         }
 
         if (isset($apiResponse['offset'])) {
-            $recordset->offset = $apiResponse['offset'];
+            $recordset->offset = (string)$apiResponse['offset'];
         }
         
         return $recordset;

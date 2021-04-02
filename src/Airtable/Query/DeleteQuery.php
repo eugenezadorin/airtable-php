@@ -10,6 +10,7 @@ use Zadorin\Airtable\Recordset;
 
 class DeleteQuery extends AbstractQuery
 {
+    /** @var Record[] */
     protected array $records = [];
 
     public function delete(Record ...$records): self

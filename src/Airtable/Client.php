@@ -54,7 +54,7 @@ class Client
     }
 
     /**
-     * @var Record|array $args
+     * @param Record|array ...$args
      * @return InsertQuery
      */
     public function insert(...$args): InsertQuery
@@ -67,7 +67,7 @@ class Client
     }
 
     /**
-     * @var Record $records
+     * @param Record ...$records
      * @return UpdateQuery
      */
     public function update(Record ...$records): UpdateQuery
@@ -79,7 +79,7 @@ class Client
     }
 
     /**
-     * @var Record|string $args
+     * @param Record|string ...$args
      * @return DeleteQuery
      */
     public function delete(...$args): DeleteQuery
@@ -104,6 +104,12 @@ class Client
         return $this->request;
     }
 
+    /**
+     * @param string $method
+     * @param string $uri
+     * @param array $data
+     * @param array<string, string> $headers
+     */
     public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
     {
         if ($this->throttling) {
@@ -130,10 +136,15 @@ class Client
             throw new \Zadorin\Airtable\Errors\RequestError($this->request->getPlainResponse(), $this->request->getResponseCode());
         }
 
-        return Recordset::createFromResponse($this->request->getData());
+        $responseData = $this->request->getResponseData();
+        if (!is_array($responseData)) {
+            throw new \Zadorin\Airtable\Errors\RequestError($this->request->getPlainResponse(), $this->request->getResponseCode());
+        }
+
+        return Recordset::createFromResponse($responseData);
     }
 
-    protected function throttle()
+    protected function throttle(): void
     {
         if ($this->throttler === null) {
             $this->throttler = new Throttle\LeakyBucket;

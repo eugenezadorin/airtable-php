@@ -26,13 +26,33 @@ class Record
 
     public static function createFromResponse(array $apiResponse): self
     {
-        if (!isset($apiResponse['id'])) {
+        if (isset($apiResponse['id'])) {
+            $id = (string)$apiResponse['id'];
+        } else {
             throw new Errors\CannotCreateDto('id key is missing');
         }
 
-        $record = new self($apiResponse['fields'] ?? [], $apiResponse['id']);
-        $record->createdAt = isset($apiResponse['createdTime']) ? new DateTimeImmutable($apiResponse['createdTime']) : null;
-        $record->isDeleted = $apiResponse['deleted'] ?? false;
+        if (isset($apiResponse['fields']) && is_array($apiResponse['fields'])) {
+            $fields = $apiResponse['fields'];
+        } else {
+            $fields = [];
+        }
+
+        if (isset($apiResponse['createdTime'])) {
+            $createdAt = new DateTimeImmutable((string)$apiResponse['createdTime']);
+        } else {
+            $createdAt = null;
+        }
+
+        if (isset($apiResponse['deleted'])) {
+            $isDeleted = (bool)$apiResponse['deleted'];
+        } else {
+            $isDeleted = false;
+        }
+
+        $record = new self($fields, $id);
+        $record->createdAt = $createdAt;
+        $record->isDeleted = $isDeleted;
 
         return $record;
     }

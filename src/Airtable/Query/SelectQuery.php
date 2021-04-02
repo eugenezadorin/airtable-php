@@ -11,10 +11,13 @@ class SelectQuery extends AbstractQuery
 {
     public const MAX_PAGE_SIZE = 100;
 
+    /** @var string[] */
     protected array $selectFields = [];
 
+    /** @var array<string, string> */
     protected array $filterConditions = [];
 
+    /** @var array<string, string> */
     protected array $orderConditions = [];
 
     protected ?string $offset = null;
@@ -84,12 +87,18 @@ class SelectQuery extends AbstractQuery
         return $this;
     }
 
+    /**
+     * @param array<string, string> $conditions 
+     */
     public function where(array $conditions): self
     {
         $this->filterConditions = $conditions;
         return $this;
     }
 
+    /**
+     * @param array<string, string> $conditions 
+     */
     public function orderBy(array $conditions): self
     {
         $this->orderConditions = $conditions;
