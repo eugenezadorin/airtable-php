@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Zadorin\Airtable\Record;
 use Zadorin\Airtable\ArgParser;
+use Zadorin\Airtable\Errors;
 
 it('properly converts mixed set of args', function () {
     $parsed = ArgParser::makeRecordsFromFields(
@@ -34,7 +35,7 @@ it('allows only arrays and Record objects when creating records from fields', fu
         new Record(['foo' => 'bar']),
         'test'
     );
-})->throws(InvalidArgumentException::class);
+})->throws(Errors\InvalidArgument::class);
 
 it('can create records using strings as record id', function () {
     $parsed = ArgParser::makeRecordsFromIds(
@@ -55,4 +56,4 @@ it('allows only strings and Record objects when creating records from ids', func
         'rec2',
         100
     );
-})->throws(InvalidArgumentException::class);
+})->throws(Errors\InvalidArgument::class);

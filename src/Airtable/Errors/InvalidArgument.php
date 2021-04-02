@@ -2,7 +2,7 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class ClientNotSpecified extends AirtableError
+class InvalidArgument extends PackageError
 {
 
 }

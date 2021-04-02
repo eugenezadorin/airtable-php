@@ -87,6 +87,28 @@ $request->getPlainResponse(); // response body (string)
 $request->getResponseInfo(); // array provided by curl_getinfo()
 ```
 
+## Exceptions
+
+All package exceptions inherits from common `Zadorin\Airtable\Errors\AirtableError` class.
+
+Also you may be interested in `Zadorin\Airtable\Errors\RequestError` which contains last request instance:
+
+```php
+try {
+    $inserted = $client->table($tableName)->insert()->execute();
+} catch (RequestError $e) {
+    
+    // catch Airtable responses here
+    var_dump($e->getMessage());
+    var_dump($e->getLastRequest()->getResponseInfo());
+
+} catch (AirtableError $e) {
+
+    // catch package errors. In that case it will be "No records specified for insert"
+
+}
+```
+
 ## ToDo
 
 [x] Insert/update/delete both arrays and records
@@ -103,7 +125,7 @@ $request->getResponseInfo(); // array provided by curl_getinfo()
 
 [x] Expose test tables
 
-[ ] Improve exceptions inheritance
+[x] Improve exceptions inheritance
 
 [ ] Clean up code
 

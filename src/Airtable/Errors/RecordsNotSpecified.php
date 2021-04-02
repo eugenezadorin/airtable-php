@@ -2,7 +2,7 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class RecordsNotSpecified extends AirtableError
+class RecordsNotSpecified extends PackageError
 {
 
 }

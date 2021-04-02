@@ -133,12 +133,12 @@ class Client
         $this->request->send();
 
         if (!$this->request->isSuccess()) {
-            throw new \Zadorin\Airtable\Errors\RequestError($this->request->getPlainResponse(), $this->request->getResponseCode());
+            throw new Errors\RequestError('Bad HTTP code', $this->request->getResponseCode(), null, $this->request);
         }
 
         $responseData = $this->request->getResponseData();
         if (!is_array($responseData)) {
-            throw new \Zadorin\Airtable\Errors\RequestError($this->request->getPlainResponse(), $this->request->getResponseCode());
+            throw new Errors\RequestError('Empty body', $this->request->getResponseCode(), null, $this->request);
         }
 
         return Recordset::createFromResponse($responseData);

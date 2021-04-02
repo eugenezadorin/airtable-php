@@ -43,7 +43,7 @@ class Request
     public function setUri(string $uri): self
     {
         if (filter_var($uri, FILTER_VALIDATE_URL) === false) {
-            throw new Errors\RequestError('Invalid URI');
+            throw new Errors\InvalidArgument('Invalid URI');
         }
         $this->uri = $uri;
         return $this;
@@ -126,7 +126,7 @@ class Request
         if ($result === false) {
             $errorText = curl_error($this->handler);
             curl_close($this->handler);
-            throw new Errors\RequestError($errorText, $this->responseCode);
+            throw new Errors\RequestError($errorText, $this->responseCode, null, $this);
         } else {
             $this->responseBody = (string)$result;
         }

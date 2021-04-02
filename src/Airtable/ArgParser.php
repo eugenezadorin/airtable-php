@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
-use \InvalidArgumentException;
+use Zadorin\Airtable\Errors;
 
 class ArgParser
 {
     /**
      * @param mixed ...$args
      * @return Record[]
-     * @throws InvalidArgumentException
+     * @throws Errors\InvalidArgument
      */
     public static function makeRecordsFromFields(...$args): array
     {
@@ -38,7 +38,7 @@ class ArgParser
             } elseif ($arg instanceof Record) {
                 $records[] = $arg;
             } else {
-                throw new InvalidArgumentException('Only arrays or instances of Zadorin\Airtable\Record are allowed');
+                throw new Errors\InvalidArgument('Only arrays or instances of Zadorin\Airtable\Record are allowed');
             }
         }
         return $records;
@@ -47,7 +47,7 @@ class ArgParser
     /**
      * @param mixed ...$args
      * @return Record[]
-     * @throws InvalidArgumentException
+     * @throws Errors\InvalidArgument
      */
     public static function makeRecordsFromIds(...$args): array
     {
@@ -60,7 +60,7 @@ class ArgParser
             } elseif (is_string($arg)) {
                 $records[] = new Record([], $arg);
             } else {
-                throw new InvalidArgumentException('Only record ids or instances of Zadorin\Airtable\Record are allowed');
+                throw new Errors\InvalidArgument('Only record ids or instances of Zadorin\Airtable\Record are allowed');
             }
         }
         return $records;
