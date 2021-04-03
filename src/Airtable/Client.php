@@ -133,12 +133,12 @@ class Client
         $this->request->send();
 
         if (!$this->request->isSuccess()) {
-            throw new Errors\RequestError('Bad HTTP code', $this->request->getResponseCode(), null, $this->request);
+            throw new Errors\RequestError($this->request, 'Bad HTTP code', $this->request->getResponseCode());
         }
 
         $responseData = $this->request->getResponseData();
         if (!is_array($responseData)) {
-            throw new Errors\RequestError('Empty body', $this->request->getResponseCode(), null, $this->request);
+            throw new Errors\RequestError($this->request, 'Empty body', $this->request->getResponseCode());
         }
 
         return Recordset::createFromResponse($responseData);

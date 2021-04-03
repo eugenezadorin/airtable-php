@@ -6,22 +6,32 @@
 
 ## Usage
 
+### Basic setup
+
 ```php
 $apiKey = 'key***********';
 $database = 'app***********';
 $tableName = 'my-table';
 
 $client = new \Zadorin\Airtable\Client($apiKey, $database);
+```
 
-// insert some rows
+You can find API key in your [account settings](https://airtable.com/account) and database name in [API Docs](https://airtable.com/api).
+
+### Insert some rows
+
+```php
 $client->table($tableName)
     ->insert([
         ['name' => 'Ivan', 'email' => 'ivan@test.tld'],
         ['name' => 'Peter', 'email' => 'peter@test.tld']
     ])
     ->execute();
+```
 
-// fetch data
+### Fetch data
+
+```php
 $recordset = $client->table($tableName)
     ->select('id', 'name', 'email')
     ->where(['name' => 'Ivan', 'email' => 'ivan@test.tld'])
@@ -31,8 +41,11 @@ $recordset = $client->table($tableName)
 
 var_dump($recordset->fetchAll()); // returns set of Record objects
 var_dump($recordset->asArray()); // returns array of arrays
+```
 
-// iterate and update
+### Iterate and update records
+
+```php
 while ($record = $recordset->fetch()) {
     var_dump($record->getId()); // rec**********
     var_dump($record->getFields()); // [id => 1, name => Ivan, email => ivan@test.tld]
@@ -40,8 +53,11 @@ while ($record = $recordset->fetch()) {
     $record->setFields(['name' => 'Ivan the 1st']);
     $client->table($tableName)->update($record);
 }
+```
 
-// pagination
+### Pagination
+
+```php
 $query = $client->table($tableName)
     ->select('id')
     ->orderBy(['id' => 'desc'])
@@ -50,8 +66,11 @@ $query = $client->table($tableName)
 while ($recordset = $query->nextPage()) {
     var_dump($recordset->fetchAll());
 }
+```
 
-// remove rows
+### Remove rows
+
+```php
 $records = $client->table($tableName)
     ->select('id', 'email')
     ->where(['email' => 'peter@test.tld'])
@@ -127,9 +146,9 @@ try {
 
 [x] Improve exceptions inheritance
 
-[ ] Test on PHP8
+[x] Test on PHP8
 
-[ ] Improve readme (split examples)
+[x] Improve readme (split examples)
 
 [ ] Set 0.0.1 tag
 
@@ -143,12 +162,14 @@ try {
 
 ## Tests
 
-Copy this [readonly test database](https://airtable.com/shrs2bB37sScbDuLX) into your Airtable account.
-
-Then fill env variables specified in `phpunit.xml.dist`. 
-
-You can find `AIRTABLE_API_KEY` in your [account settings](https://airtable.com/account) and `AIRTABLE_TEST_DB` in [API Docs](https://airtable.com/api).
+Copy this [readonly test database](https://airtable.com/shrs2bB37sScbDuLX) into your Airtable account, then fill env variables specified in `phpunit.xml.dist`. 
 
 And finally run test suite:
 
     ./vendor/bin/pest
+
+## Known problems
+
+Client uses `ext-curl` to make requests and `ext-json` to encode/decode results. Make sure this php extensions installed and properly configured.
+
+If you see `SSL certificate problem: unable to get local issuer certificate` you probably have to configure option `curl.cainfo` in your `php.ini`. [Source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)

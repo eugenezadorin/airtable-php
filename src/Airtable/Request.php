@@ -126,7 +126,7 @@ class Request
         if ($result === false) {
             $errorText = curl_error($this->handler);
             curl_close($this->handler);
-            throw new Errors\RequestError($errorText, $this->responseCode, null, $this);
+            throw new Errors\RequestError($this, $errorText, $this->responseCode);
         } else {
             $this->responseBody = (string)$result;
         }

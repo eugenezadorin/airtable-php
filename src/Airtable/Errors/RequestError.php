@@ -14,7 +14,7 @@ class RequestError extends ApiError
      * @param \Throwable $previous
      * @param Request $lastRequest
      */
-    public function __construct($message = 'Request failure', $code = 0, \Throwable $previous = null, Request $lastRequest)
+    public function __construct(Request $lastRequest, $message = 'Request failure', $code = 0, \Throwable $previous = null)
     {
         $this->lastRequest = $lastRequest;    
         parent::__construct($message, $code, $previous);
