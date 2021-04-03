@@ -155,8 +155,6 @@ class Client
         }
 
         return $responseData;
-
-        //return Recordset::createFromResponse($responseData);
     }
 
     protected function throttle(): void
