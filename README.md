@@ -150,7 +150,7 @@ try {
 
 [x] Improve readme (split examples)
 
-[ ] Set 0.0.1 tag
+[x] Set 0.0.1 tag
 
 [ ] Publish on packagist
 
@@ -160,6 +160,18 @@ try {
 
 [ ] Clean up code
 
+## Known problems
+
+Client uses `ext-curl` to make requests and `ext-json` to encode/decode results. Make sure this php extensions installed and properly configured.
+
+If you see `SSL certificate problem: unable to get local issuer certificate` you probably have to configure option `curl.cainfo` in your `php.ini`. [Source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)
+
+## License and contributing
+
+MIT License. Any feedback is highly appreciated — welcome to [issues](https://github.com/eugenezadorin/airtable-php/issues). 
+
+If you want to send pull request make sure all tests are pass.
+
 ## Tests
 
 Copy this [readonly test database](https://airtable.com/shrs2bB37sScbDuLX) into your Airtable account, then fill env variables specified in `phpunit.xml.dist`. 
@@ -168,8 +180,6 @@ And finally run test suite:
 
     ./vendor/bin/pest
 
-## Known problems
+It's also recommended to use static analysis tool to avoid errors:
 
-Client uses `ext-curl` to make requests and `ext-json` to encode/decode results. Make sure this php extensions installed and properly configured.
-
-If you see `SSL certificate problem: unable to get local issuer certificate` you probably have to configure option `curl.cainfo` in your `php.ini`. [Source](https://stackoverflow.com/questions/28858351/php-ssl-certificate-error-unable-to-get-local-issuer-certificate)
+    ./vendor/bin/psalm
