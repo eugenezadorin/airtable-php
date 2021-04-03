@@ -7,6 +7,7 @@ namespace Zadorin\Airtable;
 use Stiphle\Throttle;
 use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Query\SelectQuery;
+use Zadorin\Airtable\Query\FindQuery;
 use Zadorin\Airtable\Query\InsertQuery;
 use Zadorin\Airtable\Query\UpdateQuery;
 use Zadorin\Airtable\Query\DeleteQuery;
@@ -50,6 +51,18 @@ class Client
     {
         $query = new SelectQuery($this);
         $query->select(...$fields);
+        return $query;
+    }
+
+    /**
+     * @param Record|string ...$args
+     * @return FindQuery
+     */
+    public function find(...$args): FindQuery
+    {
+        $records = ArgParser::makeRecordsFromIds(...$args);
+        $query = new FindQuery($this);
+        $query->find(...$records);
         return $query;
     }
 
@@ -110,7 +123,7 @@ class Client
      * @param array $data
      * @param array<string, string> $headers
      */
-    public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): Recordset
+    public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): array
     {
         if ($this->throttling) {
             $this->throttle();
@@ -141,7 +154,9 @@ class Client
             throw new Errors\RequestError($this->request, 'Empty body', $this->request->getResponseCode());
         }
 
-        return Recordset::createFromResponse($responseData);
+        return $responseData;
+
+        //return Recordset::createFromResponse($responseData);
     }
 
     protected function throttle(): void

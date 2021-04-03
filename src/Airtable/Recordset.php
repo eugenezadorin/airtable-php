@@ -11,6 +11,14 @@ class Recordset
 
     protected ?string $offset = null;
 
+    /**
+     * @param Record[] $records
+     */
+    public function __construct(array $records = [])
+    {
+        $this->records = $records;
+    }
+
     public static function createFromResponse(array $apiResponse): self
     {
         if (!isset($apiResponse['records'])) {

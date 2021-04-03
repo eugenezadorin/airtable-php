@@ -32,6 +32,8 @@ class UpdateQuery extends AbstractQuery
                 'fields' => $record->getFields()
             ];
         }
-        return $this->client->call('PATCH', '', $data);
+        return Recordset::createFromResponse(
+            $this->client->call('PATCH', '', $data)
+        );
     }
 }

@@ -29,11 +29,11 @@ $client->table($tableName)
     ->execute();
 ```
 
-### Fetch data
+### Fetch multiple rows
 
 ```php
 $recordset = $client->table($tableName)
-    ->select('id', 'name', 'email')
+    ->select('id', 'name', 'email') // you can use shortcut select('*') to fetch all columns
     ->where(['name' => 'Ivan', 'email' => 'ivan@test.tld'])
     ->orderBy(['id' => 'desc'])
     ->limit(10)
@@ -41,6 +41,14 @@ $recordset = $client->table($tableName)
 
 var_dump($recordset->fetchAll()); // returns set of Record objects
 var_dump($recordset->asArray()); // returns array of arrays
+```
+
+### Fetch specific rows by record id
+
+```php
+$recordset = $client->table($tableName)
+    ->find('rec1*******', 'rec2*******')
+    ->execute();
 ```
 
 ### Iterate and update records
@@ -59,7 +67,7 @@ while ($record = $recordset->fetch()) {
 
 ```php
 $query = $client->table($tableName)
-    ->select('id')
+    ->select('*')
     ->orderBy(['id' => 'desc'])
     ->paginate(50); // limit(50) works the same. Default (and maximal) page size is 100
 
@@ -129,30 +137,6 @@ try {
 ```
 
 ## ToDo
-
-[x] Insert/update/delete both arrays and records
-
-[x] Delete records
-
-[x] Pagination
-
-[x] Request throttling
-
-[x] Debug mode
-
-[x] Static analyzis
-
-[x] Expose test tables
-
-[x] Improve exceptions inheritance
-
-[x] Test on PHP8
-
-[x] Improve readme (split examples)
-
-[x] Set 0.0.1 tag
-
-[ ] Publish on packagist
 
 [ ] Complex filter expressions
 

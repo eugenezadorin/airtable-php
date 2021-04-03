@@ -56,7 +56,9 @@ class SelectQuery extends AbstractQuery
             $urlParams['offset'] = $this->offset;
         }
 
-        return $this->client->call('GET', '?' . http_build_query($urlParams));
+        return Recordset::createFromResponse(
+            $this->client->call('GET', '?' . http_build_query($urlParams))
+        );
     }
 
     public function nextPage(): ?Recordset

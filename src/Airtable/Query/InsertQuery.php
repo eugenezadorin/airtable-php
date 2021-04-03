@@ -31,6 +31,8 @@ class InsertQuery extends AbstractQuery
                 'fields' => $record->getFields()
             ];
         }
-        return $this->client->call('POST', '', $data);
+        return Recordset::createFromResponse(
+            $this->client->call('POST', '', $data)
+        );
     }
 }

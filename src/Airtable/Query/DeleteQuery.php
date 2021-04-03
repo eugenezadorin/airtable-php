@@ -30,10 +30,8 @@ class DeleteQuery extends AbstractQuery
             $data['records'][] = $record->getId();
         }
 
-        //$converter = fn($data) => http_build_query($data);
-        //$headers = ['Content-Type' => 'application/x-www-form-urlencoded'];
-
-        return $this->client
-            ->call('DELETE', '?' . http_build_query($data));
+        return Recordset::createFromResponse(
+            $this->client->call('DELETE', '?' . http_build_query($data))
+        );
     }
 }
