@@ -57,3 +57,28 @@ it('allows only strings and Record objects when creating records from ids', func
         100
     );
 })->throws(Errors\InvalidArgument::class);
+
+test('isArrayOfArrays() method works properly', function () {
+    expect(ArgParser::isArrayOfArrays([
+        'foo' => 'bar'
+    ]))->toBeFalse();
+
+    expect(ArgParser::isArrayOfArrays([
+        'foo' => 'bar', 
+        ['baz' => 'qux']
+    ]))->toBeFalse();
+
+    expect(ArgParser::isArrayOfArrays([
+        ['foo' => 'bar'],
+        'Qux'
+    ]))->toBeFalse();
+
+    expect(ArgParser::isArrayOfArrays([
+        ['foo' => 'bar']
+    ]))->toBeTrue();
+
+    expect(ArgParser::isArrayOfArrays([
+        ['foo' => 'bar'],
+        ['baz' => 'qux']
+    ]))->toBeTrue();
+});

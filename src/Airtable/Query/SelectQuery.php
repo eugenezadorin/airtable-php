@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Zadorin\Airtable\Query;
 
 use Zadorin\Airtable\Errors;
+use Zadorin\Airtable\Filter\ConditionsSet;
+use Zadorin\Airtable\Filter\LogicCollection;
 use Zadorin\Airtable\Recordset;
 
 class SelectQuery extends AbstractQuery
@@ -14,8 +16,9 @@ class SelectQuery extends AbstractQuery
     /** @var string[] */
     protected array $selectFields = [];
 
-    /** @var array<string, string> */
-    protected array $filterConditions = [];
+    protected ?LogicCollection $filterConditions = null;
+
+    protected ?string $rawFormula = null;
 
     /** @var array<string, string> */
     protected array $orderConditions = [];
@@ -34,14 +37,10 @@ class SelectQuery extends AbstractQuery
             $urlParams['fields'] = $this->selectFields;
         }
 
-        if (count($this->filterConditions) > 0) {
-            $formulas = [];
-            // @todo: each condition should be object of Condition class
-            foreach ($this->filterConditions as $field => $value) {
-                $formulas[] = sprintf("{%s}='%s'", $field, $value);
-            }
-
-            $urlParams['filterByFormula'] = 'AND(' . implode(', ', $formulas) . ')';
+        if ($this->rawFormula !== null) {
+            $urlParams['filterByFormula'] = $this->rawFormula;
+        } elseif ($this->filterConditions !== null) {
+            $urlParams['filterByFormula'] = $this->filterConditions->getFormula();
         }
 
         if (count($this->orderConditions) > 0) {
@@ -90,12 +89,67 @@ class SelectQuery extends AbstractQuery
     }
 
     /**
-     * @param array<string, string> $conditions 
+     * @param string $field
+     * @param string $operator
+     * @param string $value
+     * @throws Errors\InvalidArgument
      */
-    public function where(array $conditions): self
+    public function where(): self
     {
-        $this->filterConditions = $conditions;
+        $this->filterConditions = new LogicCollection();
+        $conditions = ConditionsSet::buildFromArgs(func_get_args());
+        $this->filterConditions->and($conditions);
         return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param string $value
+     * @throws Errors\InvalidArgument
+     * @see SelectQuery::where()
+     */
+    public function andWhere(): self
+    {
+        if ($this->filterConditions === null) {
+            $this->filterConditions = new LogicCollection();
+        }
+        $conditions = ConditionsSet::buildFromArgs(func_get_args());
+        $this->filterConditions->and($conditions);
+        return $this;
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param string $value
+     * @throws Errors\InvalidArgument
+     * @see SelectQuery::where()
+     */
+    public function orWhere(): self
+    {
+        if ($this->filterConditions === null) {
+            $this->filterConditions = new LogicCollection();
+        }
+        $conditions = ConditionsSet::buildFromArgs(func_get_args());
+        $this->filterConditions->or($conditions);
+        return $this;
+    }
+
+    public function whereRaw(string $formula): self
+    {
+        $this->rawFormula = $formula;
+        return $this;
+    }
+
+    public function getFormula(): string
+    {
+        if ($this->rawFormula !== null) {
+            return $this->rawFormula;
+        } elseif ($this->filterConditions !== null) {
+            return $this->filterConditions->getFormula();
+        }
+        return '';
     }
 
     /**

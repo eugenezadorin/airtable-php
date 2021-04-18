@@ -70,16 +70,20 @@ class ArgParser
      * @param mixed $var
      * @return bool
      */
-    protected static function isArrayOfArrays($var): bool
+    public static function isArrayOfArrays($var): bool
     {
-        if (is_array($var) && count($var) > 0) {
-            /** @var mixed */
-            $first = reset($var);
-            if ($first && is_array($first)) {
-                return true;
+        if (!is_array($var)) {
+            return false;
+        }
+        if (count($var) < 1) {
+            return false;
+        }
+        foreach ($var as $item) {
+            if (!is_array($item)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**
@@ -88,13 +92,17 @@ class ArgParser
      */
     protected static function isArrayOfRecords($var): bool
     {
-        if (is_array($var) && count($var) > 0) {
-            /** @var mixed */
-            $first = reset($var);
-            if ($first && $first instanceof Record) {
-                return true;
+        if (!is_array($var)) {
+            return false;
+        }
+        if (count($var) < 1) {
+            return false;
+        }
+        foreach ($var as $item) {
+            if (!($item instanceof Record)) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
