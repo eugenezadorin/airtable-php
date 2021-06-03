@@ -227,8 +227,6 @@ try {
 
 ## ToDo
 
-[ ] Complex filter expressions
-
 [ ] Simple joins
 
 [ ] Clean up code
