@@ -24,17 +24,18 @@ class LogicCollection
     }
 
     /**
-     * 
+     * @psalm-suppress UnnecessaryVarAnnotation
      */
     public function getFormula(): string
     {
         $infixExpression = [];
         $maxKey = count($this->conditionGroups) - 1;
 
-        /** @var ConditionsSet $operand */
-        /** @var string $operator */
-        /** @var int $k */
         foreach (array_reverse($this->conditionGroups) as $k => [$operand, $operator]) {
+
+            /** @var ConditionsSet $operand */
+            /** @var string $operator */
+
             $infixExpression[] = $operand;
             if ($k < $maxKey) {
                 $infixExpression[] = $operator;
@@ -50,18 +51,24 @@ class LogicCollection
             } else {
                 $arg1 = array_shift($stack);
                 $arg2 = array_shift($stack);
-                array_unshift($stack, sprintf('%s(%s, %s)', $value, $arg1, $arg2));
+                array_unshift($stack, sprintf('%s(%s, %s)', (string)$value, $arg1, $arg2));
             }
         }
 
         return array_shift($stack);
     }
 
+    /**
+     * @param ConditionsSet|string $arg
+     */
     protected function isOperand($arg): bool
     {
         return $arg instanceof ConditionsSet;
     }
 
+    /**
+     * @param ConditionsSet|string $arg
+     */
     protected function isOperator($arg): bool
     {
         return is_string($arg) && in_array($arg, [
@@ -73,17 +80,22 @@ class LogicCollection
 
     /**
      * @link https://scanftree.com/Data_Structure/infix-to-prefix
+     * @psalm-param array<ConditionsSet|string> $infixExpression
+     * @psalm-return array<ConditionsSet|string>
      */
     protected function infixToPostfix(array $infixExpression): array
     {
+        /** @psalm-var array<ConditionsSet|string> */
         $result = [];
+
+        /** @var string[] */
         $stack = [];
 
         foreach ($infixExpression as $symbol) {
             if ($symbol instanceof ConditionsSet) {
                 $result[] = $symbol;
             } else {
-                if (isset($stack[0]) && $this->getOperatorPriority((string)$stack[0]) > $this->getOperatorPriority((string)$symbol)) {
+                if (isset($stack[0]) && $this->getOperatorPriority($stack[0]) > $this->getOperatorPriority($symbol)) {
                     $result[] = array_shift($stack);
                 }
                 array_unshift($stack, $symbol);

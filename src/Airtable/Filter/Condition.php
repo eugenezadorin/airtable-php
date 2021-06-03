@@ -8,8 +8,14 @@ class Condition
 
     protected string $operator;
 
+    /** @var mixed */
     protected $value;
 
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param mixed $value
+     */
     public function __construct(string $field, string $operator, $value)
     {
         $this->field = $field;
@@ -27,6 +33,9 @@ class Condition
         return $this->operator;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->value;
@@ -34,6 +43,12 @@ class Condition
 
     public function __toString()
     {
-        return sprintf("{%s}%s'%s'", $this->field, $this->operator, $this->value);
+        if (is_float($this->value) || is_int($this->value)) {
+            $value = $this->value;
+        } else {
+            $value = (string)$this->value;
+        }
+        
+        return sprintf("{%s}%s'%s'", $this->field, $this->operator, $value);
     }
 }

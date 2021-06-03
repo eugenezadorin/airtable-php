@@ -23,41 +23,70 @@ class ConditionsSet
     }
 
     /**
-     * @param string $field
-     * @param string $operator
-     * @param string $value
+     * @param array $args One, two or three arguments
      * @throws Errors\InvalidArgument
      */
     public static function buildFromArgs(array $args): self
     {
-        $set = new self();
-
         if (count($args) === 3) {
-            $set->push(new Condition((string)$args[0], (string)$args[1], $args[2]));
+            return self::buildAsFieldOperatorValue((string)$args[0], (string)$args[1], $args[2]);
         } elseif (count($args) === 2) {
-            $set->push(new Condition((string)$args[0], '=', $args[1]));
-        } elseif (count($args) === 1) {
-
-            if (ArgParser::isArrayOfArrays($args[0])) {
-                foreach ($args[0] as $cond) {
-                    if (count($cond) === 3) {
-                        $set->push(new Condition((string)$cond[0], (string)$cond[1], $cond[2]));
-                    } elseif (count($cond) === 2) {
-                        $set->push(new Condition((string)$cond[0], '=', $cond[1]));
-                    } else {
-                        throw new Errors\InvalidArgument('Invalid where statement');
-                    }
-                }
-            } elseif (is_array($args[0])) {
-                foreach ($args[0] as $field => $value) {
-                    $set->push(new Condition((string)$field, '=', $value));
-                }
-            } else {
-                throw new Errors\InvalidArgument('Invalid where statement');
-            }
-
+            return self::buildAsFieldEqualsValue((string)$args[0], $args[1]);
+        } elseif (count($args) === 1 && is_array($args[0])) {
+            return self::buildFromArray($args[0]);
         } else {
             throw new Errors\InvalidArgument('Method where() expects one, two or three arguments');
+        }
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param mixed $value
+     */
+    protected static function buildAsFieldOperatorValue(string $field, string $operator, $value): self
+    {
+        $set = new self();
+        $set->push(new Condition($field, $operator, $value));
+        return $set;
+    }
+
+    /**
+     * @param string $field
+     * @param mixed $value
+     */
+    protected static function buildAsFieldEqualsValue(string $field, $value): self
+    {
+        return self::buildAsFieldOperatorValue($field, '=', $value);
+    }
+
+    protected static function buildFromArray(array $conditions): self
+    {
+        $set = new self();
+
+        if (ArgParser::isArrayOfArrays($conditions)) {
+
+            /** @var array $condition */
+            foreach ($conditions as $condition) {
+                if (count($condition) === 3) {
+                    [$field, $operator, $value] = $condition;
+                } elseif (count($condition) === 2) {
+                    [$field, $value] = $condition;
+                    $operator = '=';
+                } else {
+                    throw new Errors\InvalidArgument('Invalid where statement');
+                }
+
+                $set->push(new Condition((string)$field, (string)$operator, $value));
+            }
+            
+        } else {
+
+            /** @var mixed $value */
+            foreach ($conditions as $field => $value) {
+                $set->push(new Condition((string)$field, '=', $value));
+            }
+
         }
 
         return $set;
