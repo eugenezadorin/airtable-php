@@ -88,6 +88,95 @@ $records = $client->table($tableName)
 $client->delete(...$records)->execute();
 ```
 
+## Complex filters
+
+You can build complex formulas to filter records, but be careful, because formula applies to each record and can slow down your query.
+
+Assume we prepared following query object:
+
+```php
+$query = $client->table('my-table')->select('*');
+```
+
+### Query builder
+
+The following lines give the same results:
+
+```php
+$query->where(['email' => 'ivan@test.tld']);
+$query->where('email', 'ivan@test.tld');
+$query->where('email', '=', 'ivan@test.tld');
+```
+
+You can use different logical operators:
+
+```php
+$query->where('email', '!=', 'ivan@test.tld');
+$query->where('code', '>', 100);
+```
+
+It's possible to concat multiple where statements:
+
+```php
+$query->where([
+    ['code', '>', 100],
+    ['code', '<', 200],
+]);
+```
+
+Or chain methods to achieve the same result:
+
+```php
+$query->where('code', '>', 100)->andWhere('code', '<', 200);
+```
+
+Note you should chain `andWhere()` or `orWhere()` methods. Don't do this:
+
+```php
+$query->where('code', '>', 100)->where('code', '<', 200);
+```
+
+Because client will use only last condition (`code < 200`).
+
+### OR-logic
+
+```php
+$query->where('name', 'Ivan')->orWhere('id', 5);
+```
+
+Methods `where()`, `andWhere()`, `orWhere()` use the same signature, so you can combine them:
+
+```php
+$query->where('code', '>', 100)
+    ->andWhere('code', '<', 500)
+    ->orWhere([
+        ['code', '<', 100],
+        ['id', '=', 5]
+    ]);
+```
+
+### Raw formula
+
+You can see what exact formula was built:
+
+```php
+$query->where([
+    ['Code', '>', 100],
+    ['Code', '<', 300]
+])
+->orWhere('Name', 'Qux');
+    
+$query->getFormula(); // OR(AND({Code}>'100', {Code}<'300'), {Name}='Qux')
+```
+
+Also you can filter records by raw formula:
+
+```php
+$query->whereRaw("OR( AND({Code}>'100', {Code}<'300'), {Name}='Qux' )");
+```
+
+Note that library don't validate raw formulas so you can get exception from Airtable API.
+
 ## Throttling
 
 Airtable API is limited to 5 requests per second per base. Client uses simple throttling library to keep this limit.
