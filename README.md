@@ -155,6 +155,35 @@ $query->where('code', '>', 100)
     ]);
 ```
 
+### Regex filtering
+
+Besides logical operators, you can use keywords `like` and `match` in your where-statements.
+
+Keyword `match` allows you to apply `REGEXP_MATCH()` function to your filter formula. 
+Airtable's REGEX functions are implemented using the [RE2 regular expression library](https://github.com/google/re2/wiki/Syntax),
+so be sure that syntax of your regular expression is correct:
+
+```php
+// look for emails, matching @gmail.com in case-insensitive way
+$query->where('email', 'match', '(?i)^(.+)@gmail.com$');
+```
+
+Keyword `like` also uses `REGEXP_MATCH()` under the hood, but provides more SQL-like syntax:
+
+```php
+// look for emails, which ends with @gmail.com
+$query->where('email', 'like', '%@gmail.com');
+
+// look for names, which starts with Ivan
+$query->where('name', 'like', 'Ivan%');
+
+// look for urls, which contains substring (both variants below works the same):
+$query->where('url', 'like', '%github%');
+$query->where('url', 'like', 'github');
+```
+
+Please note, that `like` is case-sensitive, so if you want to ignore case, you'd better use `match` with `i`-flag.
+
 ### Raw formula
 
 You can see what exact formula was built:
@@ -174,6 +203,9 @@ Also you can filter records by raw formula:
 ```php
 $query->whereRaw("OR( AND({Code}>'100', {Code}<'300'), {Name}='Qux' )");
 ```
+
+All query builder methods are used to make raw formula under the hood.
+It means that if the functionality of query builder is not enough, you can always use raw formula instead.
 
 Note that library don't validate raw formulas so you can get exception from Airtable API.
 

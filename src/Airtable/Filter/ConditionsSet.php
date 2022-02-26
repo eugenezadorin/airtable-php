@@ -4,6 +4,8 @@ namespace Zadorin\Airtable\Filter;
 
 use Zadorin\Airtable\ArgParser;
 use Zadorin\Airtable\Errors;
+use Zadorin\Airtable\Filter\Condition\Condition;
+use Zadorin\Airtable\Filter\Condition\ConditionFactory;
 
 class ConditionsSet
 {
@@ -47,7 +49,7 @@ class ConditionsSet
     protected static function buildAsFieldOperatorValue(string $field, string $operator, $value): self
     {
         $set = new self();
-        $set->push(new Condition($field, $operator, $value));
+        $set->push(ConditionFactory::make($field, $operator, $value));
         return $set;
     }
 
@@ -77,14 +79,14 @@ class ConditionsSet
                     throw new Errors\InvalidArgument('Invalid where statement');
                 }
 
-                $set->push(new Condition((string)$field, (string)$operator, $value));
+                $set->push(ConditionFactory::make((string)$field, (string)$operator, $value));
             }
             
         } else {
 
             /** @var mixed $value */
             foreach ($conditions as $field => $value) {
-                $set->push(new Condition((string)$field, '=', $value));
+                $set->push(ConditionFactory::make((string)$field, '=', $value));
             }
 
         }
