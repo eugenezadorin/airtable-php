@@ -13,7 +13,8 @@
         "php": "^7.4|^8.0",
         "ext-curl": "*",
         "ext-json": "*",
-        "davedevelopment/stiphle": "^0.9.2"
+        "davedevelopment/stiphle": "^0.9.2",
+        "symfony/polyfill-php80": "^1.25"
     },
     "require-dev": {
         "pestphp/pest": "^1.0",

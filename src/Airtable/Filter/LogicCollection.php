@@ -4,9 +4,9 @@ namespace Zadorin\Airtable\Filter;
 
 class LogicCollection
 {
-    const OPERATOR_AND = 'AND';
-    const OPERATOR_OR = 'OR';
-    const OPERATOR_NOT = 'NOT';
+    public const OPERATOR_AND = 'AND';
+    public const OPERATOR_OR = 'OR';
+    public const OPERATOR_NOT = 'NOT';
 
     /** @var array<int, array{0: ConditionsSet, 1: string}> */
     protected array $conditionGroups = [];

@@ -130,14 +130,6 @@ Or chain methods to achieve the same result:
 $query->where('code', '>', 100)->andWhere('code', '<', 200);
 ```
 
-Note you should chain `andWhere()` or `orWhere()` methods. Don't do this:
-
-```php
-$query->where('code', '>', 100)->where('code', '<', 200);
-```
-
-Because client will use only last condition (`code < 200`).
-
 ### OR-logic
 
 ```php

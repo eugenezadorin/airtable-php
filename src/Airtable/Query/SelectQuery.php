@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Zadorin\Airtable\Query;
 
 use Zadorin\Airtable\Errors;
+use Zadorin\Airtable\Filter\Condition\DateConditionFactory;
+use Zadorin\Airtable\Filter\Condition\ScalarConditionFactory;
 use Zadorin\Airtable\Filter\ConditionsSet;
 use Zadorin\Airtable\Filter\LogicCollection;
 use Zadorin\Airtable\Recordset;
@@ -17,6 +19,8 @@ class SelectQuery extends AbstractQuery
     protected array $selectFields = [];
 
     protected ?LogicCollection $filterConditions = null;
+
+	protected ?string $currentLogicOperator = null;
 
     protected ?string $rawFormula = null;
 
@@ -37,11 +41,10 @@ class SelectQuery extends AbstractQuery
             $urlParams['fields'] = $this->selectFields;
         }
 
-        if ($this->rawFormula !== null) {
-            $urlParams['filterByFormula'] = $this->rawFormula;
-        } elseif ($this->filterConditions !== null) {
-            $urlParams['filterByFormula'] = $this->filterConditions->getFormula();
-        }
+		$formula = $this->getFormula();
+		if (!empty($formula)) {
+			$urlParams['filterByFormula'] = $formula;
+		}
 
         if (count($this->orderConditions) > 0) {
             foreach ($this->orderConditions as $field => $direction) {
@@ -96,51 +99,94 @@ class SelectQuery extends AbstractQuery
      */
     public function where(): self
     {
-        $this->filterConditions = new LogicCollection();
-        $conditions = ConditionsSet::buildFromArgs(func_get_args());
-        $this->filterConditions->and($conditions);
-        return $this;
+        return $this->withFilterConditions(
+			new ConditionsSet(new ScalarConditionFactory(), func_get_args())
+		);
     }
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param string $value
-     * @throws Errors\InvalidArgument
-     * @see SelectQuery::where()
-     */
-    public function andWhere(): self
-    {
-        if ($this->filterConditions === null) {
-            $this->filterConditions = new LogicCollection();
-        }
-        $conditions = ConditionsSet::buildFromArgs(func_get_args());
-        $this->filterConditions->and($conditions);
-        return $this;
-    }
+	protected function withFilterConditions(ConditionsSet $conditions): self
+	{
+		if ($this->currentLogicOperator === LogicCollection::OPERATOR_OR) {
+			$this->getFilterConditions()->or($conditions);
+		} else {
+			$this->getFilterConditions()->and($conditions);
+		}
+		$this->currentLogicOperator = null;
+		return $this;
+	}
 
-    /**
-     * @param string $field
-     * @param string $operator
-     * @param string $value
-     * @throws Errors\InvalidArgument
-     * @see SelectQuery::where()
-     */
-    public function orWhere(): self
-    {
-        if ($this->filterConditions === null) {
-            $this->filterConditions = new LogicCollection();
-        }
-        $conditions = ConditionsSet::buildFromArgs(func_get_args());
-        $this->filterConditions->or($conditions);
-        return $this;
-    }
+	// @todo i think it's time to extract query builder into separate class
+	public function __call(string $name, array $arguments)
+	{
+		if (str_starts_with($name, 'andWhere'))
+		{
+			$baseMethod = lcfirst(substr($name, 3));
+			if (method_exists($this, $baseMethod))
+			{
+				$this->currentLogicOperator = LogicCollection::OPERATOR_AND;
+				return $this->$baseMethod(...$arguments);
+			}
+		}
+		elseif (str_starts_with($name, 'orWhere'))
+		{
+			$baseMethod = lcfirst(substr($name, 2));
+			if (method_exists($this, $baseMethod))
+			{
+				$this->currentLogicOperator = LogicCollection::OPERATOR_OR;
+				return $this->$baseMethod(...$arguments);
+			}
+		}
+
+		throw new Errors\MethodNotExists("Method $name not found in query builder");
+	}
 
     public function whereRaw(string $formula): self
     {
         $this->rawFormula = $formula;
         return $this;
     }
+
+	public function whereDate(): self
+	{
+		return $this->withFilterConditions(
+			new ConditionsSet(new DateConditionFactory(), func_get_args())
+		);
+	}
+
+	/**
+	 * @param string $field
+	 * @param string|\DateTimeImmutable $dateFrom
+	 * @param string|\DateTimeImmutable $dateTo
+	 * @return SelectQuery
+	 */
+	public function whereDateBetween(string $field, $dateFrom, $dateTo): self
+	{
+		return $this->whereDate([
+			[$field, '>=', $dateFrom],
+			[$field, '<=', $dateTo],
+		]);
+	}
+
+	public function whereDateTime(): self
+	{
+		return $this->withFilterConditions(
+			new ConditionsSet(DateConditionFactory::usingDateTime(), func_get_args())
+		);
+	}
+
+	/**
+	 * @param string $field
+	 * @param string|\DateTimeImmutable $dateTimeFrom
+	 * @param string|\DateTimeImmutable $dateTimeTo
+	 * @return SelectQuery
+	 */
+	public function whereDateTimeBetween(string $field, $dateTimeFrom, $dateTimeTo): self
+	{
+		return $this->whereDateTime([
+			[$field, '>=', $dateTimeFrom],
+			[$field, '<=', $dateTimeTo],
+		]);
+	}
 
     public function getFormula(): string
     {
@@ -174,4 +220,12 @@ class SelectQuery extends AbstractQuery
     {
         return $this->limit($pageCount);
     }
+
+	protected function getFilterConditions(): LogicCollection
+	{
+		if ($this->filterConditions === null) {
+			$this->filterConditions = new LogicCollection();
+		}
+		return $this->filterConditions;
+	}
 }

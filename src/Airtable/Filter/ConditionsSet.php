@@ -12,7 +12,34 @@ class ConditionsSet
     /** @var Condition[] */
     protected array $conditions = [];
 
-    public function push(Condition $condition): self
+	protected ConditionFactory $conditionFactory;
+
+	protected array $args;
+
+	/**
+	 * @param ConditionFactory $conditionFactory
+	 * @param array $args One, two or three arguments
+	 * @throws Errors\InvalidArgument
+	 */
+	public function __construct(ConditionFactory $conditionFactory, array $args)
+	{
+		$this->conditionFactory = $conditionFactory;
+		$this->args = $args;
+
+		// @todo probably all this arg parsing and initialization is part of ConditionFactory.
+		// @todo maybe i should make ConditionFactory abstract class instead of interface
+		if (count($args) === 3) {
+			$this->initAsFieldOperatorValue((string)$args[0], (string)$args[1], $args[2]);
+		} elseif (count($args) === 2) {
+			$this->initAsFieldEqualsValue((string)$args[0], $args[1]);
+		} elseif (count($args) === 1 && is_array($args[0])) {
+			$this->initFromArray($args[0]);
+		} else {
+			throw new Errors\InvalidArgument('Method where() expects one, two or three arguments');
+		}
+	}
+
+	public function push(Condition $condition): self
     {
         $this->conditions[] = $condition;
         return $this;
@@ -25,47 +52,27 @@ class ConditionsSet
     }
 
     /**
-     * @param array $args One, two or three arguments
-     * @throws Errors\InvalidArgument
-     */
-    public static function buildFromArgs(array $args): self
-    {
-        if (count($args) === 3) {
-            return self::buildAsFieldOperatorValue((string)$args[0], (string)$args[1], $args[2]);
-        } elseif (count($args) === 2) {
-            return self::buildAsFieldEqualsValue((string)$args[0], $args[1]);
-        } elseif (count($args) === 1 && is_array($args[0])) {
-            return self::buildFromArray($args[0]);
-        } else {
-            throw new Errors\InvalidArgument('Method where() expects one, two or three arguments');
-        }
-    }
-
-    /**
      * @param string $field
      * @param string $operator
      * @param mixed $value
      */
-    protected static function buildAsFieldOperatorValue(string $field, string $operator, $value): self
+    protected function initAsFieldOperatorValue(string $field, string $operator, $value): void
     {
-        $set = new self();
-        $set->push(ConditionFactory::make($field, $operator, $value));
-        return $set;
+		$condition = $this->conditionFactory->make($field, $operator, $value);
+        $this->push($condition);
     }
 
     /**
      * @param string $field
      * @param mixed $value
      */
-    protected static function buildAsFieldEqualsValue(string $field, $value): self
+    protected function initAsFieldEqualsValue(string $field, $value): void
     {
-        return self::buildAsFieldOperatorValue($field, '=', $value);
+        $this->initAsFieldOperatorValue($field, '=', $value);
     }
 
-    protected static function buildFromArray(array $conditions): self
+    protected function initFromArray(array $conditions): void
     {
-        $set = new self();
-
         if (ArgParser::isArrayOfArrays($conditions)) {
 
             /** @var array $condition */
@@ -79,19 +86,19 @@ class ConditionsSet
                     throw new Errors\InvalidArgument('Invalid where statement');
                 }
 
-                $set->push(ConditionFactory::make((string)$field, (string)$operator, $value));
+				$condition = $this->conditionFactory->make((string)$field, (string)$operator, $value);
+                $this->push($condition);
             }
             
         } else {
 
             /** @var mixed $value */
             foreach ($conditions as $field => $value) {
-                $set->push(ConditionFactory::make((string)$field, '=', $value));
+				$condition = $this->conditionFactory->make((string)$field, '=', $value);
+                $this->push($condition);
             }
 
         }
-
-        return $set;
     }
 
     public function __toString()
