@@ -122,11 +122,11 @@ class SelectQuery extends AbstractQuery
 		$logic = LogicCollection::OPERATOR_AND;
 		$baseMethod = $name;
 
-		if (str_starts_with($name, 'andWhere'))
+		if (str_starts_with($name, 'and'))
 		{
 			$baseMethod = lcfirst(substr($name, 3));
 		}
-		elseif (str_starts_with($name, 'orWhere'))
+		elseif (str_starts_with($name, 'or'))
 		{
 			$logic = LogicCollection::OPERATOR_OR;
 			$baseMethod = lcfirst(substr($name, 2));

@@ -21,6 +21,18 @@ it('fails on non-existing macro', function () {
 
 })->expectException(MethodNotExists::class);
 
+it('fails prevents macro with and- prefix', function () {
+
+	Client::macro('andWhereValue', function () {});
+
+})->expectException(InvalidArgument::class);
+
+it('fails prevents macro with or- prefix', function () {
+
+	Client::macro('orWhereValue', function () {});
+
+})->expectException(InvalidArgument::class);
+
 it('can create custom where statements', function () {
 
 	Client::macro('whereValueIsBar', function () {
@@ -87,14 +99,14 @@ test('macro supports logic modifiers', function () {
 
 it('supports passing variables to closure', function () {
 
-	Client::macro('whereName', function (string $name) {
+	Client::macro('hasName', function (string $name) {
 		return $this->where('Name', $name);
 	});
 
 	$actual = client()->table('simple_selections')
 		->select('Name', 'Value')
-		->whereName('Baz')
-		->orWhereName('Qux')
+		->hasName('Baz')
+		->orHasName('Qux')
 		->execute();
 
 	$expected = [

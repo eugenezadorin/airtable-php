@@ -176,6 +176,41 @@ $query->where('url', 'like', 'github');
 
 Please note, that `like` is case-sensitive, so if you want to ignore case, you'd better use `match` with `i`-flag.
 
+### Date filtering
+
+Library provides few methods to filter records by date and time:
+
+```php
+$query->whereDate('birthdate', new \DateTimeImmutable('2022-03-08'));
+$query->whereDateTime('meeting_start', '2022-04-01 11:00:00');
+```
+
+First parameter is your column name.
+
+You can pass `DateTimeImmutable` object or datetime string, which will be cast into `DateTimeImmutable` automatically.
+
+You can filter records by date range instead of strict equality:
+
+```php
+$query
+    ->whereDate('birthdate', '>=', new \DateTimeImmutable('2022-03-01'))
+    ->andWhereDate('birthdate', '<', new \DateTimeImmutable('2022-04-01')); 
+```
+
+There are shortcuts for that purpose:
+
+```php
+$query->whereDateBetween('birthdate', '2022-03-01', '2022-03-31'); // left and right borders included!
+$query->whereDateTimeBetween('meeting_start', '2022-04-01 11:00:00', '2022-04-01 15:00:00');
+```
+
+When searching by date (not datetime), library applies range filter under the hood.
+For example, `$query->whereDate('meeting', '2022-03-08')` will actually search records between `2022-03-08 00:00:00` and `2022-03-08 23:59:59`, 
+including left and right borders.
+
+Please note that the library does not perform any timezone conversions, so most reliable solution is to specify GMT timezone in your `DateTimeImmutable` objects, 
+and set flag `Use the same time zone (GMT) for all collaborators` in your datetime column settings.
+
 ### Raw formula
 
 You can see what exact formula was built:
@@ -190,7 +225,7 @@ $query->where([
 $query->getFormula(); // OR(AND({Code}>'100', {Code}<'300'), {Name}='Qux')
 ```
 
-Also you can filter records by raw formula:
+Also, you can filter records by raw formula:
 
 ```php
 $query->whereRaw("OR( AND({Code}>'100', {Code}<'300'), {Name}='Qux' )");
@@ -200,6 +235,56 @@ All query builder methods are used to make raw formula under the hood.
 It means that if the functionality of query builder is not enough, you can always use raw formula instead.
 
 Note that library don't validate raw formulas so you can get exception from Airtable API.
+
+### Macros
+
+You can extend query builder methods with your own using macros:
+
+```php
+\Zadorin\Airtable\Client::macro('whereCanDriveCar', function() {
+    $this->where('age', '>=', 21);
+});
+
+$query->where('state', 'Florida')->andWhereCanDriveCar();
+```
+
+Macro name must not start with `or`/`and`. These logic prefixes are reserved and handles automatically.
+
+Context `$this` inside macro callback references to query builder instance. It allows you to use other query builder methods or even other macros:
+
+```php
+Client::macro('whereStateIsFlorida', function () {
+    $this->where('state', 'Florida');
+});
+
+Client::macro('canDriveCar', function() {
+    $this->where('age', '>=', 21);
+});
+
+Client::macro('whereFloridaDriver', function() {
+    $this->whereStateIsFlorida()->andCanDriveCar();
+});
+```
+
+You can pass variables into macro callback:
+
+```php
+Client::macro('whereName', function ($name) {
+    $this->where('Name', '=', $name);
+});
+
+$query->whereName('Ivan')->orWhereName('John');
+```
+
+And of course you can use raw formula to build something more complex:
+
+```php
+Client::macro('whereBornInMay', function($year) {
+    $this->whereRaw("AND(IS_AFTER(birthdate, '$year-04-30 23:59:59'), IS_BEFORE(birthdate, '$year-06-01 00:00:00'))");
+});
+```
+
+But remember that raw formula overrides other query builder setup.
 
 ## Throttling
 
@@ -248,12 +333,6 @@ try {
 
 }
 ```
-
-## ToDo
-
-[ ] Simple joins
-
-[ ] Clean up code
 
 ## Known problems
 

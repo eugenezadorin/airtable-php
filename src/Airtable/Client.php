@@ -168,6 +168,9 @@ class Client
 		if (empty($key)) {
 			throw new Errors\InvalidArgument('Macro key must be non-empty string');
 		}
+		if (str_starts_with($key, 'and') || str_starts_with($key, 'or')) {
+			throw new Errors\InvalidArgument('Macro key cannot start with or-/and- prefix');
+		}
 		self::$macros[$key] = $callback;
 	}
 
@@ -176,7 +179,7 @@ class Client
 		return isset(self::$macros[$key]);
 	}
 
-	public static function callMacro(string $key, array $arguments, $context): void
+	public static function callMacro(string $key, array $arguments, object $context): void
 	{
 		if (!self::hasMacro($key)) {
 			throw new Errors\InvalidArgument("Macro '$key' not defined");
