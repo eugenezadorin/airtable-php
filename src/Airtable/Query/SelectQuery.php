@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable\Query;
 
+use Zadorin\Airtable\Client;
 use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Filter\Condition\DateConditionFactory;
 use Zadorin\Airtable\Filter\Condition\ScalarConditionFactory;
@@ -118,23 +119,29 @@ class SelectQuery extends AbstractQuery
 	// @todo i think it's time to extract query builder into separate class
 	public function __call(string $name, array $arguments)
 	{
+		$logic = LogicCollection::OPERATOR_AND;
+		$baseMethod = $name;
+
 		if (str_starts_with($name, 'andWhere'))
 		{
 			$baseMethod = lcfirst(substr($name, 3));
-			if (method_exists($this, $baseMethod))
-			{
-				$this->currentLogicOperator = LogicCollection::OPERATOR_AND;
-				return $this->$baseMethod(...$arguments);
-			}
 		}
 		elseif (str_starts_with($name, 'orWhere'))
 		{
+			$logic = LogicCollection::OPERATOR_OR;
 			$baseMethod = lcfirst(substr($name, 2));
-			if (method_exists($this, $baseMethod))
-			{
-				$this->currentLogicOperator = LogicCollection::OPERATOR_OR;
-				return $this->$baseMethod(...$arguments);
-			}
+		}
+
+		if (method_exists($this, $baseMethod))
+		{
+			$this->currentLogicOperator = $logic;
+			return $this->$baseMethod(...$arguments);
+		}
+		elseif (Client::hasMacro($baseMethod))
+		{
+			$this->currentLogicOperator = $logic;
+			Client::callMacro($baseMethod, $arguments, $this);
+			return $this;
 		}
 
 		throw new Errors\MethodNotExists("Method $name not found in query builder");

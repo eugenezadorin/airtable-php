@@ -30,6 +30,11 @@ class Client
 
     protected ?Request $request = null;
 
+	/**
+	 * @var array<string, \Closure>
+	 */
+	protected static array $macros = [];
+
     public function __construct(string $apiKey, string $databaseName)
     {
         $this->apiKey = $apiKey;
@@ -156,6 +161,30 @@ class Client
 
         return $responseData;
     }
+
+	public static function macro(string $key, \Closure $callback): void
+	{
+		$key = trim($key);
+		if (empty($key)) {
+			throw new Errors\InvalidArgument('Macro key must be non-empty string');
+		}
+		self::$macros[$key] = $callback;
+	}
+
+	public static function hasMacro(string $key): bool
+	{
+		return isset(self::$macros[$key]);
+	}
+
+	public static function callMacro(string $key, array $arguments, $context): void
+	{
+		if (!self::hasMacro($key)) {
+			throw new Errors\InvalidArgument("Macro '$key' not defined");
+		}
+
+		$closure = self::$macros[$key];
+		$closure->call($context, ...$arguments);
+	}
 
     protected function throttle(): void
     {
