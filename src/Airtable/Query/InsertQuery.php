@@ -13,10 +13,18 @@ class InsertQuery extends AbstractQuery
     /** @var Record[] */
     protected array $records = [];
 
+    protected bool $typecast = false;
+
     public function insert(Record ...$records): self
     {
         $this->records = $records;
         return $this;
+    }
+
+    public function typecast(bool $typecast = true): self
+    {
+      $this->typecast = $typecast;
+      return $this;
     }
 
     public function execute(): Recordset
@@ -25,7 +33,7 @@ class InsertQuery extends AbstractQuery
             throw new Errors\RecordsNotSpecified('At least one record must be specified');
         }
 
-        $data = ['records' => []];
+        $data = ['records' => [], 'typecast' => $this->typecast];
         foreach ($this->records as $record) {
             $data['records'][] = [
                 'fields' => $record->getFields()
