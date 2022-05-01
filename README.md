@@ -286,6 +286,36 @@ Client::macro('whereBornInMay', function($year) {
 
 But remember that raw formula overrides other query builder setup.
 
+## Typecast
+
+Airtable supports linked fields, which references other rows from current or another table. 
+Assume you have `users` table where `contacts` field is a link to row in another table.
+
+By default, you have to specify concrete row ID while inserting or updating such fields:
+
+```php
+$client
+    ->table('users')
+    ->insert(['name' => 'Ivan', 'contacts' => 'recSPVbdx5vXwyLoH'])
+    ->execute();
+```
+
+It's not very handy, so Airtable API supports `typecast` parameter, which enables automatic data conversion from string values.
+
+Automatic conversion is disabled by default to ensure data integrity, but sometimes it may be helpful.
+
+This is how you can enable that feature:
+
+```php
+$client
+    ->table('users')
+    ->insert(['name' => 'Ivan', 'contacts' => 'ivan@test.tld'])
+    ->typecast(true) // true is default value and can be skipped
+    ->execute();
+```
+
+Update queries works the same.
+
 ## Throttling
 
 Airtable API is limited to 5 requests per second per base. Client uses simple throttling library to keep this limit.
