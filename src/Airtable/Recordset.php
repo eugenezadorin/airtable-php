@@ -76,6 +76,11 @@ class Recordset
         return $result;
     }
 
+	public function toArray(): array
+	{
+		return $this->asArray();
+	}
+
     public function getOffset(): ?string
     {
         return $this->offset;
