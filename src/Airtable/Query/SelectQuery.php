@@ -34,6 +34,8 @@ class SelectQuery extends AbstractQuery
 
     protected int $limit = 100;
 
+	protected ?string $view = null;
+
     public function execute(): Recordset
     {
         $urlParams = [];
@@ -58,6 +60,10 @@ class SelectQuery extends AbstractQuery
         if ($this->offset !== null) {
             $urlParams['offset'] = $this->offset;
         }
+
+		if ($this->view !== null) {
+			$urlParams['view'] = $this->view;
+		}
 
         return Recordset::createFromResponse(
             $this->client->call('GET', '?' . http_build_query($urlParams))
@@ -145,6 +151,20 @@ class SelectQuery extends AbstractQuery
 		}
 
 		throw new Errors\MethodNotExists("Method $name not found in query builder");
+	}
+
+	public function whereView(string $view): self
+	{
+		$this->view = $view;
+		return $this;
+	}
+
+	/**
+	 * @deprecated View is not actually part of the filter formula, so you can use AND-logic only.
+	 */
+	public function orWhereView(string $view): self
+	{
+		throw new Errors\LogicError('Cannot specify view using OR-operator');
 	}
 
     public function whereRaw(string $formula): self

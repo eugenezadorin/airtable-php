@@ -236,6 +236,37 @@ It means that if the functionality of query builder is not enough, you can alway
 
 Note that library don't validate raw formulas so you can get exception from Airtable API.
 
+### View
+
+Sometimes it is more convenient to create a specific table view with predefined sorting and filters, 
+instead of building a complex query in the source code.
+
+Assuming you have `tasks` table and `active tasks` view containing only active tasks ordered by priority:
+
+```php
+$records = $client->table('tasks')
+    ->select('*')
+    ->whereView('active tasks')
+    ->execute();
+```
+
+You can combine view and additional filters, specify subset of selected fields and override order just like normal select query:
+
+```php
+$records = $client->table('tasks')
+    ->select('Name', 'Priority')
+    ->whereView('active tasks')
+    ->andWhere('Status', 'todo')
+    ->orderBy(['Id' => 'desc'])
+    ->execute();
+```
+
+You can use alias `andWhereView()` but method `orWhereView()` will throw `LogicError`. 
+This is because view is not actually part of the filter formula, it always works like "view AND formula", 
+so you can't use `OR` operator here.
+
+Also note that if view not exists `RequestError` exception will be thrown.
+
 ### Macros
 
 You can extend query builder methods with your own using macros:
