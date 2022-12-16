@@ -8,6 +8,7 @@ it('can fetch records collection', function () {
     $recordset = client()->table('simple_selections')
         ->select('Name', 'Value')
         ->where(['Value' => 'Bar'])
+        ->orderBy(['Code' => 'asc'])
         ->limit(2)
         ->execute();
 
@@ -26,6 +27,7 @@ it('can iterate through records', function () {
     $recordset = client()->table('simple_selections')
         ->select('Name', 'Value')
         ->where(['Value' => 'Bar'])
+        ->orderBy(['Code' => 'asc'])
         ->limit(2)
         ->execute();
 

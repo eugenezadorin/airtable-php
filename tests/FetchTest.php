@@ -7,6 +7,7 @@ use Zadorin\Airtable\Errors\RequestError;
 it('can fetch simple data without any filtration', function () {
     $actual = client()->table('simple_selections')
         ->select('Name', 'Value')
+        ->orderBy(['Code' => 'asc'])
         ->limit(2)
         ->execute();
 
@@ -21,6 +22,7 @@ it('can fetch simple data without any filtration', function () {
 it('fetches all rows and columns if we not specify limits', function () {
     $actual = client()->table('simple_selections')
         ->select()
+        ->orderBy(['Code' => 'asc'])
         ->execute();
 
     $expected = [
@@ -35,6 +37,7 @@ it('fetches all rows and columns if we not specify limits', function () {
 it('allows to use * wildcard to select all fields', function () {
     $actual = client()->table('simple_selections')
         ->select('*')
+        ->orderBy(['Code' => 'asc'])
         ->execute();
 
     $expected = [

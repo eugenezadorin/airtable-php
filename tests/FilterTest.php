@@ -6,6 +6,7 @@ it('can filter records by single criteria', function () {
     $actual = client()->table('simple_selections')
         ->select('Name', 'Value')
         ->where(['Value' => 'Bar'])
+        ->orderBy(['Code' => 'asc'])
         ->execute();
 
     $expected = [
@@ -78,7 +79,8 @@ it('can use OR statement', function () {
         ->select('*')
         ->where('Code', '>', 100)
         ->andWhere('Code', '<', 300)
-        ->orWhere('Name', 'Qux');
+        ->orWhere('Name', 'Qux')
+        ->orderBy(['Code' => 'asc']);
 
     $formula = $query->getFormula();
     $result = $query->execute();
@@ -97,7 +99,8 @@ it('can parse nested statements', function () {
             ['Code', '>', 100],
             ['Code', '<', 300]
         ])
-        ->orWhere('Name', 'Qux');
+        ->orWhere('Name', 'Qux')
+        ->orderBy(['Code' => 'asc']);
     
     $formula = $query->getFormula();
     $result = $query->execute();
@@ -116,7 +119,8 @@ it('uses AND logic inside OR statement', function () {
         ->orWhere([
             ['Code', '<=', 200],
             ['Name', '=', 'Foo'],
-        ]);
+        ])
+        ->orderBy(['Code' => 'asc']);
 
     $formula = $query->getFormula();
     $result = $query->execute();
@@ -134,7 +138,8 @@ it('can use multiple OR statements', function () {
         ->select('Name', 'Value', 'Code')
         ->where('Code', '>', 200)
         ->orWhere('Name', '=', 'Foo')
-        ->orWhere('Value', '=', '123');
+        ->orWhere('Value', '=', '123')
+        ->orderBy(['Code' => 'asc']);
 
     $formula = $query->getFormula();
     $result = $query->execute();
@@ -153,7 +158,8 @@ it('properly resolves andWhere after orWhere', function () {
         ->select('Name', 'Value', 'Code')
         ->where('Value', '=', 'Bar')
         ->orWhere('Value', '=', '123')
-        ->andWhere('Code', '>=', 200);
+        ->andWhere('Code', '>=', 200)
+        ->orderBy(['Code' => 'asc']);
 
     $formula = $query->getFormula();
     $result = $query->execute();
@@ -171,6 +177,7 @@ it('can filter by raw formula', function () {
     $actual = client()->table('simple_selections')
         ->select('Name', 'Value', 'Code')
         ->whereRaw("OR( AND({Code}>'100', {Code}<'300'), {Name}='Qux' )")
+        ->orderBy(['Code' => 'asc'])
         ->execute();
 
     $expected = [

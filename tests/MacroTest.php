@@ -42,6 +42,7 @@ it('can create custom where statements', function () {
 	$actual = client()->table('simple_selections')
 		->select('Name', 'Value')
 		->whereValueIsBar()
+        ->orderBy(['Code' => 'asc'])
 		->execute();
 
 	$expected = [
@@ -86,6 +87,7 @@ test('macro supports logic modifiers', function () {
 		->select('Name', 'Value')
 		->where('Name', 'Qux')
 		->orWhereValueIsBar()
+        ->orderBy(['Code' => 'asc'])
 		->execute();
 
 	$expected = [
@@ -107,6 +109,7 @@ it('supports passing variables to closure', function () {
 		->select('Name', 'Value')
 		->hasName('Baz')
 		->orHasName('Qux')
+        ->orderBy(['Code' => 'asc'])
 		->execute();
 
 	$expected = [
