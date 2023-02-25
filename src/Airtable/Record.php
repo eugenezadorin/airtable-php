@@ -6,15 +6,15 @@ namespace Zadorin\Airtable;
 
 use DateTimeImmutable;
 
-class Record
+final class Record
 {
-    protected ?string $id = null;
+    private ?string $id = null;
 
-    protected array $fields = [];
+    private array $fields = [];
 
-    protected ?DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
-    protected bool $isDeleted = false;
+    private bool $isDeleted = false;
 
     public function __construct(array $fields = [], ?string $id = null)
     {

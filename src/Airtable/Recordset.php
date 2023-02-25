@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
-class Recordset
+final class Recordset
 {
     /** @var Record[] */
-    protected array $records = [];
+    private array $records = [];
 
-    protected ?string $offset = null;
+    private ?string $offset = null;
 
     /**
      * @param  Record[]  $records
@@ -65,7 +65,7 @@ class Recordset
 
     public function isEmpty(): bool
     {
-        return count($this->records) === 0;
+        return $this->records === [];
     }
 
     public function asArray(): array

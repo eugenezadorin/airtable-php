@@ -37,6 +37,6 @@
         "pint": "pint --test",
         "pint:exec": "pint",
         "rector": "rector process --dry-run",
-        "rector:exec": "rector"
+        "rector:exec": "rector process"
     }
 }

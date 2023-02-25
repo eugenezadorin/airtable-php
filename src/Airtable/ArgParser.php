@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
-class ArgParser
+final class ArgParser
 {
     /**
-     * @param  mixed  ...$args
      * @return Record[]
-     *
      * @throws Errors\InvalidArgument
      */
-    public static function makeRecordsFromFields(...$args): array
+    public static function makeRecordsFromFields(mixed ...$args): array
     {
         $records = [];
 
-        /** @var mixed $arg */
+        /** @psalm-var mixed $arg */
         foreach ($args as $arg) {
             if (is_array($arg)) {
                 if (self::isArrayOfArrays($arg)) {
@@ -43,16 +41,14 @@ class ArgParser
     }
 
     /**
-     * @param  mixed  ...$args
      * @return Record[]
-     *
      * @throws Errors\InvalidArgument
      */
-    public static function makeRecordsFromIds(...$args): array
+    public static function makeRecordsFromIds(mixed ...$args): array
     {
         $records = [];
 
-        /** @var mixed $arg */
+        /** @psalm-var mixed $arg */
         foreach ($args as $arg) {
             if ($arg instanceof Record) {
                 $records[] = $arg;
@@ -66,10 +62,7 @@ class ArgParser
         return $records;
     }
 
-    /**
-     * @param  mixed  $var
-     */
-    public static function isArrayOfArrays($var): bool
+    public static function isArrayOfArrays(mixed $var): bool
     {
         if (! is_array($var)) {
             return false;
@@ -86,10 +79,7 @@ class ArgParser
         return true;
     }
 
-    /**
-     * @param  mixed  $var
-     */
-    protected static function isArrayOfRecords($var): bool
+    private static function isArrayOfRecords(mixed $var): bool
     {
         if (! is_array($var)) {
             return false;

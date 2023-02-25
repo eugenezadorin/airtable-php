@@ -1,34 +1,36 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zadorin\Airtable;
 
-class Request
+final class Request
 {
-    protected string $method = 'GET';
+    private string $method = 'GET';
 
-    protected string $uri = '';
+    private string $uri = '';
 
     /**
      * @var array<string, string>
      */
-    protected array $requestHeaders = [];
+    private array $requestHeaders = [];
 
-    protected string $requestBody = '';
+    private string $requestBody = '';
 
-    protected array $allowedMethods = [
+    private const ALLOWED_METHODS = [
         'GET', 'POST', 'PUT', 'PATCH', 'DELETE',
     ];
 
-    protected int $responseCode = 0;
+    private int $responseCode = 0;
 
-    protected string $responseBody = '';
+    private string $responseBody = '';
 
-    protected array $responseInfo = [];
+    private array $responseInfo = [];
 
     public function setMethod(string $method): self
     {
         $method = mb_strtoupper($method);
-        if (! in_array($method, $this->allowedMethods)) {
+        if (! in_array($method, self::ALLOWED_METHODS)) {
             throw new Errors\MethodNotAllowed('Request method not allowed');
         }
         $this->method = $method;
@@ -63,20 +65,14 @@ class Request
         return $this;
     }
 
-    /**
-     * @param  mixed  $fields
-     */
-    public function setData($fields): self
+    public function setData(mixed $fields): self
     {
         $this->requestBody = json_encode($fields, JSON_THROW_ON_ERROR);
 
         return $this;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getResponseData()
+    public function getResponseData(): mixed
     {
         return json_decode($this->responseBody, true, 512, JSON_THROW_ON_ERROR);
     }
@@ -98,11 +94,7 @@ class Request
 
     public function isSuccess(): bool
     {
-        if ($this->responseCode >= 200 && $this->responseCode < 300) {
-            return true;
-        }
-
-        return false;
+        return ($this->responseCode >= 200 && $this->responseCode < 300);
     }
 
     public function send(): string
@@ -121,15 +113,14 @@ class Request
 
         $this->responseInfo = (array) curl_getinfo($handler);
 
-        $this->responseCode = intval($this->responseInfo['http_code']);
+        $this->responseCode = (int) $this->responseInfo['http_code'];
 
         if ($result === false) {
             $errorText = curl_error($handler);
             curl_close($handler);
             throw new Errors\RequestError($this, $errorText, $this->responseCode);
-        } else {
-            $this->responseBody = (string) $result;
         }
+        $this->responseBody = (string) $result;
 
         curl_close($handler);
 
@@ -139,7 +130,7 @@ class Request
     /**
      * @return string[]
      */
-    protected function prepareCurlHeaders(): array
+    private function prepareCurlHeaders(): array
     {
         $result = [];
         foreach ($this->requestHeaders as $key => $value) {

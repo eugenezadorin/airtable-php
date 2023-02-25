@@ -11,28 +11,28 @@ use Zadorin\Airtable\Query\InsertQuery;
 use Zadorin\Airtable\Query\SelectQuery;
 use Zadorin\Airtable\Query\UpdateQuery;
 
-class Client
+final class Client
 {
-    public const BASE_URL = 'https://api.airtable.com/v0';
+    private const BASE_URL = 'https://api.airtable.com/v0';
 
-    public const MAX_RPS = 5;
+    private const MAX_RPS = 5;
 
-    protected string $apiKey = '';
+    private string $apiKey = '';
 
-    protected string $databaseName = '';
+    private string $databaseName = '';
 
-    protected string $tableName = '';
+    private string $tableName = '';
 
-    protected bool $throttling = true;
+    private bool $throttling = true;
 
-    protected ?Throttle\ThrottleInterface $throttler = null;
+    private ?Throttle\ThrottleInterface $throttler = null;
 
-    protected ?Request $request = null;
+    private ?Request $request = null;
 
     /**
      * @var array<string, \Closure>
      */
-    protected static array $macros = [];
+    private static array $macros = [];
 
     public function __construct(string $apiKey, string $databaseName)
     {
@@ -60,10 +60,7 @@ class Client
         return $query;
     }
 
-    /**
-     * @param  Record|string  ...$args
-     */
-    public function find(...$args): FindQuery
+    public function find(Record|string ...$args): FindQuery
     {
         $records = ArgParser::makeRecordsFromIds(...$args);
         $query = new FindQuery($this);
@@ -72,10 +69,7 @@ class Client
         return $query;
     }
 
-    /**
-     * @param  Record|array  ...$args
-     */
-    public function insert(...$args): InsertQuery
+    public function insert(Record|array ...$args): InsertQuery
     {
         $records = ArgParser::makeRecordsFromFields(...$args);
         $query = new InsertQuery($this);
@@ -92,10 +86,7 @@ class Client
         return $query;
     }
 
-    /**
-     * @param  Record|string  ...$args
-     */
-    public function delete(...$args): DeleteQuery
+    public function delete(Record|string ...$args): DeleteQuery
     {
         $records = ArgParser::makeRecordsFromIds(...$args);
         $query = new DeleteQuery($this);
@@ -182,7 +173,7 @@ class Client
         $closure->call($context, ...$arguments);
     }
 
-    protected function throttle(): void
+    private function throttle(): void
     {
         if ($this->throttler === null) {
             $this->throttler = new Throttle\LeakyBucket();
