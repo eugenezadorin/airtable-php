@@ -7,25 +7,18 @@ use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Filter\Condition\Condition;
 use Zadorin\Airtable\Filter\Condition\ConditionFactory;
 
-class ConditionsSet
+final class ConditionsSet implements \Stringable
 {
     /** @var Condition[] */
-    protected array $conditions = [];
-
-    protected ConditionFactory $conditionFactory;
-
-    protected array $args;
+    private array $conditions = [];
 
     /**
      * @param  array  $args One, two or three arguments
      *
      * @throws Errors\InvalidArgument
      */
-    public function __construct(ConditionFactory $conditionFactory, array $args)
+    public function __construct(protected ConditionFactory $conditionFactory, protected array $args)
     {
-        $this->conditionFactory = $conditionFactory;
-        $this->args = $args;
-
         // @todo probably all this arg parsing and initialization is part of ConditionFactory.
         // @todo maybe i should make ConditionFactory abstract class instead of interface
         if (count($args) === 3) {
@@ -52,24 +45,18 @@ class ConditionsSet
         return $this->conditions;
     }
 
-    /**
-     * @param  mixed  $value
-     */
-    protected function initAsFieldOperatorValue(string $field, string $operator, $value): void
+    private function initAsFieldOperatorValue(string $field, string $operator, mixed $value): void
     {
         $condition = $this->conditionFactory->make($field, $operator, $value);
         $this->push($condition);
     }
 
-    /**
-     * @param  mixed  $value
-     */
-    protected function initAsFieldEqualsValue(string $field, $value): void
+    private function initAsFieldEqualsValue(string $field, mixed $value): void
     {
         $this->initAsFieldOperatorValue($field, '=', $value);
     }
 
-    protected function initFromArray(array $conditions): void
+    private function initFromArray(array $conditions): void
     {
         if (ArgParser::isArrayOfArrays($conditions)) {
             /** @var array $condition */
@@ -87,7 +74,7 @@ class ConditionsSet
                 $this->push($condition);
             }
         } else {
-            /** @var mixed $value */
+            /** @psalm-var mixed $value */
             foreach ($conditions as $field => $value) {
                 $condition = $this->conditionFactory->make((string) $field, '=', $value);
                 $this->push($condition);
@@ -95,7 +82,7 @@ class ConditionsSet
         }
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         $formulas = [];
         foreach ($this->conditions as $condition) {
@@ -103,10 +90,10 @@ class ConditionsSet
         }
         if (count($formulas) > 1) {
             return 'AND('.implode(', ', $formulas).')';
-        } elseif (count($formulas) === 1) {
-            return $formulas[0];
-        } else {
-            return '';
         }
+        if (count($formulas) === 1) {
+            return $formulas[0];
+        }
+        return '';
     }
 }

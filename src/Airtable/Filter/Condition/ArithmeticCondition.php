@@ -2,32 +2,15 @@
 
 namespace Zadorin\Airtable\Filter\Condition;
 
-class ArithmeticCondition extends Condition
+final class ArithmeticCondition extends Condition
 {
-    protected string $field;
-
-    protected string $operator;
-
-    /** @var mixed */
-    protected $value;
-
-    /**
-     * @param  mixed  $value
-     */
-    public function __construct(string $field, string $operator, $value)
+    public function __construct(protected string $field, protected string $operator, protected mixed $value)
     {
-        $this->field = $field;
-        $this->operator = $operator;
-        $this->value = $value;
     }
 
     public function toString(): string
     {
-        if (is_float($this->value) || is_int($this->value)) {
-            $value = $this->value;
-        } else {
-            $value = (string) $this->value;
-        }
+        $value = is_float($this->value) || is_int($this->value) ? $this->value : (string) $this->value;
 
         return sprintf("{%s}%s'%s'", $this->field, $this->operator, $value);
     }

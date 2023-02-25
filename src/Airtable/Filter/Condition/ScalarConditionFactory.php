@@ -2,22 +2,14 @@
 
 namespace Zadorin\Airtable\Filter\Condition;
 
-class ScalarConditionFactory implements ConditionFactory
+final class ScalarConditionFactory implements ConditionFactory
 {
-    /**
-     * @param  mixed  $value
-     */
-    public function make(string $field, string $operator, $value): Condition
+    public function make(string $field, string $operator, mixed $value): Condition
     {
-        switch ($operator) {
-            case 'like':
-                return new LikeCondition($field, (string) $value);
-
-            case 'match':
-                return new MatchCondition($field, (string) $value);
-
-            default:
-                return new ArithmeticCondition($field, $operator, $value);
-        }
+        return match ($operator) {
+            'like' => new LikeCondition($field, (string) $value),
+            'match' => new MatchCondition($field, (string) $value),
+            default => new ArithmeticCondition($field, $operator, $value),
+        };
     }
 }

@@ -40,7 +40,7 @@ final class SelectQuery extends AbstractQuery
     {
         $urlParams = [];
 
-        if (count($this->selectFields) > 0) {
+        if ($this->selectFields !== []) {
             $urlParams['fields'] = $this->selectFields;
         }
 
@@ -49,10 +49,8 @@ final class SelectQuery extends AbstractQuery
             $urlParams['filterByFormula'] = $formula;
         }
 
-        if (count($this->orderConditions) > 0) {
-            foreach ($this->orderConditions as $field => $direction) {
-                $urlParams['sort'][] = ['field' => $field, 'direction' => $direction];
-            }
+        foreach ($this->orderConditions as $field => $direction) {
+            $urlParams['sort'][] = ['field' => $field, 'direction' => $direction];
         }
 
         $urlParams['pageSize'] = $this->limit > 0 ? $this->limit : 0;
@@ -90,11 +88,7 @@ final class SelectQuery extends AbstractQuery
 
     public function select(string ...$fields): self
     {
-        if (in_array('*', $fields)) {
-            $this->selectFields = [];
-        } else {
-            $this->selectFields = $fields;
-        }
+        $this->selectFields = in_array('*', $fields) ? [] : $fields;
 
         return $this;
     }
@@ -137,15 +131,14 @@ final class SelectQuery extends AbstractQuery
             $logic = LogicCollection::OPERATOR_OR;
             $baseMethod = lcfirst(substr($name, 2));
         }
-
         if (method_exists($this, $baseMethod)) {
             $this->currentLogicOperator = $logic;
-
             return $this->$baseMethod(...$arguments);
-        } elseif (Client::hasMacro($baseMethod)) {
+        }
+
+        if (Client::hasMacro($baseMethod)) {
             $this->currentLogicOperator = $logic;
             Client::callMacro($baseMethod, $arguments, $this);
-
             return $this;
         }
 
@@ -162,7 +155,7 @@ final class SelectQuery extends AbstractQuery
     /**
      * @deprecated View is not actually part of the filter formula, so you can use AND-logic only.
      */
-    public function orWhereView(string $view): self
+    public function orWhereView(string $view): never
     {
         throw new Errors\LogicError('Cannot specify view using OR-operator');
     }
@@ -181,11 +174,7 @@ final class SelectQuery extends AbstractQuery
         );
     }
 
-    /**
-     * @param  string|\DateTimeImmutable  $dateFrom
-     * @param  string|\DateTimeImmutable  $dateTo
-     */
-    public function whereDateBetween(string $field, $dateFrom, $dateTo): self
+    public function whereDateBetween(string $field, string|\DateTimeImmutable $dateFrom, string|\DateTimeImmutable $dateTo): self
     {
         return $this->whereDate([
             [$field, '>=', $dateFrom],
@@ -200,11 +189,7 @@ final class SelectQuery extends AbstractQuery
         );
     }
 
-    /**
-     * @param  string|\DateTimeImmutable  $dateTimeFrom
-     * @param  string|\DateTimeImmutable  $dateTimeTo
-     */
-    public function whereDateTimeBetween(string $field, $dateTimeFrom, $dateTimeTo): self
+    public function whereDateTimeBetween(string $field, string|\DateTimeImmutable $dateTimeFrom, string|\DateTimeImmutable $dateTimeTo): self
     {
         return $this->whereDateTime([
             [$field, '>=', $dateTimeFrom],
@@ -216,7 +201,8 @@ final class SelectQuery extends AbstractQuery
     {
         if ($this->rawFormula !== null) {
             return $this->rawFormula;
-        } elseif ($this->filterConditions !== null) {
+        }
+        if ($this->filterConditions !== null) {
             return $this->filterConditions->getFormula();
         }
 

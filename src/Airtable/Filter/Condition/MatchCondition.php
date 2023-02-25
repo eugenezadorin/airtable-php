@@ -2,16 +2,10 @@
 
 namespace Zadorin\Airtable\Filter\Condition;
 
-class MatchCondition extends Condition
+final class MatchCondition extends Condition
 {
-    protected string $field;
-
-    protected string $regexp;
-
-    public function __construct(string $field, string $regexp)
+    public function __construct(protected string $field, protected string $regexp)
     {
-        $this->field = $field;
-        $this->regexp = $regexp;
     }
 
     public function toString(): string

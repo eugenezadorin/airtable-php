@@ -2,9 +2,9 @@
 
 namespace Zadorin\Airtable\Filter\Condition;
 
-class DateConditionFactory implements ConditionFactory
+final class DateConditionFactory implements ConditionFactory
 {
-    protected bool $useDateTime = false;
+    private bool $useDateTime = false;
 
     public static function usingDateTime(): self
     {
@@ -14,10 +14,7 @@ class DateConditionFactory implements ConditionFactory
         return $factory;
     }
 
-    /**
-     * @param  mixed  $value
-     */
-    public function make(string $field, string $operator, $value): Condition
+    public function make(string $field, string $operator, mixed $value): Condition
     {
         if (! ($value instanceof \DateTimeImmutable)) {
             $value = new \DateTimeImmutable((string) $value);

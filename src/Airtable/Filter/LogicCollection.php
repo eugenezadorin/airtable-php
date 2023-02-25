@@ -1,8 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Zadorin\Airtable\Filter;
 
-class LogicCollection
+final class LogicCollection
 {
     public const OPERATOR_AND = 'AND';
 
@@ -11,7 +13,7 @@ class LogicCollection
     public const OPERATOR_NOT = 'NOT';
 
     /** @var array<int, array{0: ConditionsSet, 1: string}> */
-    protected array $conditionGroups = [];
+    private array $conditionGroups = [];
 
     public function and(ConditionsSet $conditions): self
     {
@@ -60,24 +62,9 @@ class LogicCollection
         return array_shift($stack);
     }
 
-    /**
-     * @param  ConditionsSet|string  $arg
-     */
-    protected function isOperand($arg): bool
+    private function isOperand(ConditionsSet|string $arg): bool
     {
         return $arg instanceof ConditionsSet;
-    }
-
-    /**
-     * @param  ConditionsSet|string  $arg
-     */
-    protected function isOperator($arg): bool
-    {
-        return is_string($arg) && in_array($arg, [
-            self::OPERATOR_AND,
-            self::OPERATOR_NOT,
-            self::OPERATOR_OR,
-        ]);
     }
 
     /**
@@ -87,12 +74,12 @@ class LogicCollection
      *
      * @psalm-return array<ConditionsSet|string>
      */
-    protected function infixToPostfix(array $infixExpression): array
+    private function infixToPostfix(array $infixExpression): array
     {
-        /** @psalm-var array<ConditionsSet|string> */
+        /** @psalm-var array<ConditionsSet|string> $result */
         $result = [];
 
-        /** @var string[] */
+        /** @var string[] $stack */
         $stack = [];
 
         foreach ($infixExpression as $symbol) {
@@ -106,23 +93,21 @@ class LogicCollection
             }
         }
 
-        if (count($stack) > 0) {
-            foreach ($stack as $operator) {
-                $result[] = $operator;
-            }
+        foreach ($stack as $operator) {
+            $result[] = $operator;
         }
 
         return $result;
     }
 
-    protected function getOperatorPriority(string $operator): int
+    private function getOperatorPriority(string $operator): int
     {
         if ($operator === self::OPERATOR_NOT) {
             return 3;
-        } elseif ($operator === self::OPERATOR_AND) {
-            return 2;
-        } else {
-            return 1;
         }
+        if ($operator === self::OPERATOR_AND) {
+            return 2;
+        }
+        return 1;
     }
 }
