@@ -18,7 +18,8 @@
     "require-dev": {
         "pestphp/pest": "^1.22.4",
         "vimeo/psalm": "^4.30",
-        "laravel/pint": "^1.6"
+        "laravel/pint": "^1.6",
+        "rector/rector": "^0.15.18"
     },
     "autoload": {
         "psr-4": {
@@ -33,6 +34,9 @@
     "scripts": {
         "test": "./vendor/bin/pest",
         "psalm": "./vendor/bin/psalm",
-        "pint": "./vendor/bin/pint"
+        "pint": "pint --test",
+        "pint:exec": "pint",
+        "rector": "rector process --dry-run",
+        "rector:exec": "rector"
     }
 }
