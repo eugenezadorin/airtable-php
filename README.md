@@ -4,6 +4,12 @@
 
     composer require zadorin/airtable-php
 
+Please note that library requires PHP 8.2 since `v1.0.0` release.
+
+If you have lower PHP version, use `v0.*.*` releases:
+
+    composer require zadorin/airtable-php:^0
+
 ## Usage
 
 ### Basic setup
