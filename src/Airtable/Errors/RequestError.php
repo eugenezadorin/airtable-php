@@ -11,8 +11,7 @@ final class RequestError extends ApiError
         string $message = 'Request failure',
         int $code = 0,
         \Throwable $previous = null
-    )
-    {
+    ) {
         parent::__construct($message, $code, $previous);
     }
 
