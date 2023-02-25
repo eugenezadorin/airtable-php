@@ -10,11 +10,8 @@ use Zadorin\Airtable\Recordset;
 
 abstract class AbstractQuery
 {
-    protected Client $client;
-
-    public function __construct(Client $client)
+    public function __construct(protected Client $client)
     {
-        $this->client = $client;
         if ($this->client->getTable() === '') {
             throw new Errors\TableNotSpecified('Table name must be specified');
         }

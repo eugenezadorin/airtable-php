@@ -12,29 +12,29 @@ use Zadorin\Airtable\Filter\ConditionsSet;
 use Zadorin\Airtable\Filter\LogicCollection;
 use Zadorin\Airtable\Recordset;
 
-class SelectQuery extends AbstractQuery
+final class SelectQuery extends AbstractQuery
 {
-    public const MAX_PAGE_SIZE = 100;
+    private const MAX_PAGE_SIZE = 100;
 
     /** @var string[] */
-    protected array $selectFields = [];
+    private array $selectFields = [];
 
-    protected ?LogicCollection $filterConditions = null;
+    private ?LogicCollection $filterConditions = null;
 
-    protected ?string $currentLogicOperator = null;
+    private ?string $currentLogicOperator = null;
 
-    protected ?string $rawFormula = null;
+    private ?string $rawFormula = null;
 
     /** @var array<string, string> */
-    protected array $orderConditions = [];
+    private array $orderConditions = [];
 
-    protected ?string $offset = null;
+    private ?string $offset = null;
 
-    protected bool $hasNextPage = true;
+    private bool $hasNextPage = true;
 
-    protected int $limit = 100;
+    private int $limit = 100;
 
-    protected ?string $view = null;
+    private ?string $view = null;
 
     public function execute(): Recordset
     {
@@ -113,7 +113,7 @@ class SelectQuery extends AbstractQuery
         );
     }
 
-    protected function withFilterConditions(ConditionsSet $conditions): self
+    private function withFilterConditions(ConditionsSet $conditions): self
     {
         if ($this->currentLogicOperator === LogicCollection::OPERATOR_OR) {
             $this->getFilterConditions()->or($conditions);
@@ -248,7 +248,7 @@ class SelectQuery extends AbstractQuery
         return $this->limit($pageCount);
     }
 
-    protected function getFilterConditions(): LogicCollection
+    private function getFilterConditions(): LogicCollection
     {
         if ($this->filterConditions === null) {
             $this->filterConditions = new LogicCollection();

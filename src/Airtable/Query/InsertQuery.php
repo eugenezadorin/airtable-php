@@ -8,12 +8,12 @@ use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Record;
 use Zadorin\Airtable\Recordset;
 
-class InsertQuery extends AbstractQuery
+final class InsertQuery extends AbstractQuery
 {
     /** @var Record[] */
-    protected array $records = [];
+    private array $records = [];
 
-    protected bool $typecast = false;
+    private bool $typecast = false;
 
     public function insert(Record ...$records): self
     {

@@ -8,10 +8,10 @@ use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Record;
 use Zadorin\Airtable\Recordset;
 
-class DeleteQuery extends AbstractQuery
+final class DeleteQuery extends AbstractQuery
 {
     /** @var Record[] */
-    protected array $records = [];
+    private array $records = [];
 
     public function delete(Record ...$records): self
     {

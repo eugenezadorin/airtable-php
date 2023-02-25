@@ -8,10 +8,10 @@ use Zadorin\Airtable\Errors;
 use Zadorin\Airtable\Record;
 use Zadorin\Airtable\Recordset;
 
-class FindQuery extends AbstractQuery
+final class FindQuery extends AbstractQuery
 {
     /** @var Record[] */
-    protected array $records = [];
+    private array $records = [];
 
     public function find(Record ...$records): self
     {
