@@ -4,18 +4,15 @@ namespace Zadorin\Airtable\Errors;
 
 use Zadorin\Airtable\Request;
 
-class RequestError extends ApiError
+final class RequestError extends ApiError
 {
-    protected Request $lastRequest;
-
-    /**
-     * @param  string  $message
-     * @param  int  $code
-     * @param  \Throwable  $previous
-     */
-    public function __construct(Request $lastRequest, $message = 'Request failure', $code = 0, \Throwable $previous = null)
+    public function __construct(
+        protected Request $lastRequest,
+        string $message = 'Request failure',
+        int $code = 0,
+        \Throwable $previous = null
+    )
     {
-        $this->lastRequest = $lastRequest;
         parent::__construct($message, $code, $previous);
     }
 

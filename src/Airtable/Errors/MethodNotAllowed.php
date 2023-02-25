@@ -2,6 +2,6 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class MethodNotAllowed extends PackageError
+final class MethodNotAllowed extends PackageError
 {
 }

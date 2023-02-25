@@ -2,6 +2,6 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class LogicError extends PackageError
+final class LogicError extends PackageError
 {
 }

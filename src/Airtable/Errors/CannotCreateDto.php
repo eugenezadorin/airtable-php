@@ -2,6 +2,6 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class CannotCreateDto extends PackageError
+final class CannotCreateDto extends PackageError
 {
 }

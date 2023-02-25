@@ -2,6 +2,6 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class MethodNotExists extends PackageError
+final class MethodNotExists extends PackageError
 {
 }

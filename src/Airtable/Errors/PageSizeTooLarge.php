@@ -2,6 +2,6 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class PageSizeTooLarge extends PackageError
+final class PageSizeTooLarge extends PackageError
 {
 }

@@ -2,6 +2,6 @@
 
 namespace Zadorin\Airtable\Errors;
 
-class TableNotSpecified extends AirtableError
+final class TableNotSpecified extends AirtableError
 {
 }
