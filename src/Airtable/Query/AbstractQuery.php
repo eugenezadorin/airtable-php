@@ -20,8 +20,5 @@ abstract class AbstractQuery
         }
     }
 
-    /**
-     * @return Recordset
-     */
-    public abstract function execute(): Recordset;
+    abstract public function execute(): Recordset;
 }

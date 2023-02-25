@@ -18,13 +18,15 @@ class InsertQuery extends AbstractQuery
     public function insert(Record ...$records): self
     {
         $this->records = $records;
+
         return $this;
     }
 
     public function typecast(bool $typecast = true): self
     {
-      $this->typecast = $typecast;
-      return $this;
+        $this->typecast = $typecast;
+
+        return $this;
     }
 
     public function execute(): Recordset
@@ -36,9 +38,10 @@ class InsertQuery extends AbstractQuery
         $data = ['records' => [], 'typecast' => $this->typecast];
         foreach ($this->records as $record) {
             $data['records'][] = [
-                'fields' => $record->getFields()
+                'fields' => $record->getFields(),
             ];
         }
+
         return Recordset::createFromResponse(
             $this->client->call('POST', '', $data)
         );

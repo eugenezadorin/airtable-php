@@ -49,7 +49,7 @@ it('can filter by not-equal criteria', function () {
         ->select('Name', 'Value', 'Code')
         ->where([
             ['Value', '=', 'Bar'],
-            ['Name', '!=', 'Foo']
+            ['Name', '!=', 'Foo'],
         ])->execute();
 
     $expected = [
@@ -64,7 +64,7 @@ it('can filter by more-less criteria', function () {
         ->select('Name', 'Value', 'Code')
         ->where([
             ['Code', '>', 100],
-            ['Code', '<', 300]
+            ['Code', '<', 300],
         ])->execute();
 
     $expected = [
@@ -97,11 +97,11 @@ it('can parse nested statements', function () {
         ->select('*')
         ->where([
             ['Code', '>', 100],
-            ['Code', '<', 300]
+            ['Code', '<', 300],
         ])
         ->orWhere('Name', 'Qux')
         ->orderBy(['Code' => 'asc']);
-    
+
     $formula = $query->getFormula();
     $result = $query->execute();
 

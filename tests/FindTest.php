@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Zadorin\Airtable\Record;
 use Zadorin\Airtable\Errors\RecordsNotSpecified;
+use Zadorin\Airtable\Record;
 
 it('can find multiple records by id', function () {
     $actual = client()->table('simple_selections')

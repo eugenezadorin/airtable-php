@@ -16,6 +16,7 @@ class DeleteQuery extends AbstractQuery
     public function delete(Record ...$records): self
     {
         $this->records = $records;
+
         return $this;
     }
 
@@ -31,7 +32,7 @@ class DeleteQuery extends AbstractQuery
         }
 
         return Recordset::createFromResponse(
-            $this->client->call('DELETE', '?' . http_build_query($data))
+            $this->client->call('DELETE', '?'.http_build_query($data))
         );
     }
 }

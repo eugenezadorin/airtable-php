@@ -10,7 +10,7 @@ it('properly updates single record by record id', function () {
     $recordset = $client->insert(new Record(['name' => 'Peter']))->execute();
 
     $inserted = $recordset->fetch();
-    
+
     $update = clone $inserted;
     $update->setFields(['name' => 'Ivan']);
 
@@ -43,7 +43,7 @@ it('properly updates multiple records', function () {
 
     $recordset = $client->update(...$inserted)->execute();
     expect($recordset->count())->toEqual(2);
-    
+
     $actual = $recordset->asArray();
     foreach ($actual as $key => $value) {
         expect($value)->toMatchArray($inserted[$key]->getFields());

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Zadorin\Airtable;
 
-use Zadorin\Airtable\Errors;
 use DateTimeImmutable;
 
 class Record
@@ -27,7 +26,7 @@ class Record
     public static function createFromResponse(array $apiResponse): self
     {
         if (isset($apiResponse['id'])) {
-            $id = (string)$apiResponse['id'];
+            $id = (string) $apiResponse['id'];
         } else {
             throw new Errors\CannotCreateDto('id key is missing');
         }
@@ -39,13 +38,13 @@ class Record
         }
 
         if (isset($apiResponse['createdTime'])) {
-            $createdAt = new DateTimeImmutable((string)$apiResponse['createdTime']);
+            $createdAt = new DateTimeImmutable((string) $apiResponse['createdTime']);
         } else {
             $createdAt = null;
         }
 
         if (isset($apiResponse['deleted'])) {
-            $isDeleted = (bool)$apiResponse['deleted'];
+            $isDeleted = (bool) $apiResponse['deleted'];
         } else {
             $isDeleted = false;
         }
@@ -65,12 +64,14 @@ class Record
     public function setId(string $id): self
     {
         $this->id = $id;
+
         return $this;
     }
 
     public function setFields(array $fields): self
     {
         $this->fields = $fields;
+
         return $this;
     }
 

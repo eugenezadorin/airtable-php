@@ -12,7 +12,7 @@ class Recordset
     protected ?string $offset = null;
 
     /**
-     * @param Record[] $records
+     * @param  Record[]  $records
      */
     public function __construct(array $records = [])
     {
@@ -21,7 +21,7 @@ class Recordset
 
     public static function createFromResponse(array $apiResponse): self
     {
-        if (!isset($apiResponse['records'])) {
+        if (! isset($apiResponse['records'])) {
             throw new Errors\CannotCreateDto('records key is missing');
         }
 
@@ -35,9 +35,9 @@ class Recordset
         }
 
         if (isset($apiResponse['offset'])) {
-            $recordset->offset = (string)$apiResponse['offset'];
+            $recordset->offset = (string) $apiResponse['offset'];
         }
-        
+
         return $recordset;
     }
 
@@ -54,6 +54,7 @@ class Recordset
         }
         $value = current($this->records);
         next($this->records);
+
         return $value;
     }
 
@@ -73,13 +74,14 @@ class Recordset
         foreach ($this->records as $record) {
             $result[] = $record->getFields();
         }
+
         return $result;
     }
 
-	public function toArray(): array
-	{
-		return $this->asArray();
-	}
+    public function toArray(): array
+    {
+        return $this->asArray();
+    }
 
     public function getOffset(): ?string
     {

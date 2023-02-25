@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Zadorin\Airtable;
 
 use Stiphle\Throttle;
-use Zadorin\Airtable\Errors;
-use Zadorin\Airtable\Query\SelectQuery;
+use Zadorin\Airtable\Query\DeleteQuery;
 use Zadorin\Airtable\Query\FindQuery;
 use Zadorin\Airtable\Query\InsertQuery;
+use Zadorin\Airtable\Query\SelectQuery;
 use Zadorin\Airtable\Query\UpdateQuery;
-use Zadorin\Airtable\Query\DeleteQuery;
 
 class Client
 {
@@ -30,10 +29,10 @@ class Client
 
     protected ?Request $request = null;
 
-	/**
-	 * @var array<string, \Closure>
-	 */
-	protected static array $macros = [];
+    /**
+     * @var array<string, \Closure>
+     */
+    protected static array $macros = [];
 
     public function __construct(string $apiKey, string $databaseName)
     {
@@ -44,6 +43,7 @@ class Client
     public function table(string $tableName): self
     {
         $this->tableName = $tableName;
+
         return $this;
     }
 
@@ -56,24 +56,24 @@ class Client
     {
         $query = new SelectQuery($this);
         $query->select(...$fields);
+
         return $query;
     }
 
     /**
-     * @param Record|string ...$args
-     * @return FindQuery
+     * @param  Record|string  ...$args
      */
     public function find(...$args): FindQuery
     {
         $records = ArgParser::makeRecordsFromIds(...$args);
         $query = new FindQuery($this);
         $query->find(...$records);
+
         return $query;
     }
 
     /**
-     * @param Record|array ...$args
-     * @return InsertQuery
+     * @param  Record|array  ...$args
      */
     public function insert(...$args): InsertQuery
     {
@@ -84,10 +84,6 @@ class Client
         return $query;
     }
 
-    /**
-     * @param Record ...$records
-     * @return UpdateQuery
-     */
     public function update(Record ...$records): UpdateQuery
     {
         $query = new UpdateQuery($this);
@@ -97,8 +93,7 @@ class Client
     }
 
     /**
-     * @param Record|string ...$args
-     * @return DeleteQuery
+     * @param  Record|string  ...$args
      */
     public function delete(...$args): DeleteQuery
     {
@@ -114,6 +109,7 @@ class Client
         if ($throttling !== null) {
             $this->throttling = $throttling;
         }
+
         return $this->throttling;
     }
 
@@ -123,10 +119,7 @@ class Client
     }
 
     /**
-     * @param string $method
-     * @param string $uri
-     * @param array $data
-     * @param array<string, string> $headers
+     * @param  array<string, string>  $headers
      */
     public function call(string $method = 'GET', string $uri = '', array $data = [], array $headers = []): array
     {
@@ -135,9 +128,9 @@ class Client
         }
 
         $baseUri = sprintf('%s/%s/%s', self::BASE_URL, $this->databaseName, $this->tableName);
-        $uri = $baseUri . $uri;
+        $uri = $baseUri.$uri;
         $defaultHeaders = [
-            'Authorization' => 'Bearer ' . $this->apiKey,
+            'Authorization' => 'Bearer '.$this->apiKey,
             'Content-Type' => 'application/json',
         ];
         $headers = array_merge($defaultHeaders, $headers);
@@ -147,52 +140,52 @@ class Client
             ->setMethod($method)
             ->setHeaders($headers)
             ->setData($data);
-            
+
         $this->request->send();
 
-        if (!$this->request->isSuccess()) {
+        if (! $this->request->isSuccess()) {
             throw new Errors\RequestError($this->request, 'Bad HTTP code', $this->request->getResponseCode());
         }
 
         $responseData = $this->request->getResponseData();
-        if (!is_array($responseData)) {
+        if (! is_array($responseData)) {
             throw new Errors\RequestError($this->request, 'Empty body', $this->request->getResponseCode());
         }
 
         return $responseData;
     }
 
-	public static function macro(string $key, \Closure $callback): void
-	{
-		$key = trim($key);
-		if (empty($key)) {
-			throw new Errors\InvalidArgument('Macro key must be non-empty string');
-		}
-		if (str_starts_with($key, 'and') || str_starts_with($key, 'or')) {
-			throw new Errors\InvalidArgument('Macro key cannot start with or-/and- prefix');
-		}
-		self::$macros[$key] = $callback;
-	}
+    public static function macro(string $key, \Closure $callback): void
+    {
+        $key = trim($key);
+        if (empty($key)) {
+            throw new Errors\InvalidArgument('Macro key must be non-empty string');
+        }
+        if (str_starts_with($key, 'and') || str_starts_with($key, 'or')) {
+            throw new Errors\InvalidArgument('Macro key cannot start with or-/and- prefix');
+        }
+        self::$macros[$key] = $callback;
+    }
 
-	public static function hasMacro(string $key): bool
-	{
-		return isset(self::$macros[$key]);
-	}
+    public static function hasMacro(string $key): bool
+    {
+        return isset(self::$macros[$key]);
+    }
 
-	public static function callMacro(string $key, array $arguments, object $context): void
-	{
-		if (!self::hasMacro($key)) {
-			throw new Errors\InvalidArgument("Macro '$key' not defined");
-		}
+    public static function callMacro(string $key, array $arguments, object $context): void
+    {
+        if (! self::hasMacro($key)) {
+            throw new Errors\InvalidArgument("Macro '$key' not defined");
+        }
 
-		$closure = self::$macros[$key];
-		$closure->call($context, ...$arguments);
-	}
+        $closure = self::$macros[$key];
+        $closure->call($context, ...$arguments);
+    }
 
     protected function throttle(): void
     {
         if ($this->throttler === null) {
-            $this->throttler = new Throttle\LeakyBucket;
+            $this->throttler = new Throttle\LeakyBucket();
         }
         $requests = self::MAX_RPS;
         $inOneSecond = 1000;

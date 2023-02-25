@@ -4,10 +4,10 @@ namespace Zadorin\Airtable\Filter\Condition;
 
 abstract class Condition
 {
-    public abstract function toString(): string;
+    abstract public function toString(): string;
 
     public function __toString()
-	{
-		return $this->toString();
-	}
+    {
+        return $this->toString();
+    }
 }

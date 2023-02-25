@@ -18,13 +18,15 @@ class UpdateQuery extends AbstractQuery
     public function update(Record ...$records): self
     {
         $this->records = $records;
+
         return $this;
     }
 
     public function typecast(bool $typecast = true): self
     {
-      $this->typecast = $typecast;
-      return $this;
+        $this->typecast = $typecast;
+
+        return $this;
     }
 
     public function execute(): Recordset
@@ -37,9 +39,10 @@ class UpdateQuery extends AbstractQuery
         foreach ($this->records as $record) {
             $data['records'][] = [
                 'id' => $record->getId(),
-                'fields' => $record->getFields()
+                'fields' => $record->getFields(),
             ];
         }
+
         return Recordset::createFromResponse(
             $this->client->call('PATCH', '', $data)
         );

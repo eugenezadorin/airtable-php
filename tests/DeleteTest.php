@@ -13,7 +13,7 @@ it('can remove single record', function () {
         ->insert(new Record(['timestamp' => 200]))
         ->execute()
         ->fetch();
-    
+
     $recordToRemove = clone $inserted;
 
     $removed = $client
@@ -33,27 +33,27 @@ it('can remove multiple records', function () {
         ->execute()
         ->fetchAll();
 
-    $insertedIds = array_map(fn($record) => $record->getId(), $inserted);
+    $insertedIds = array_map(fn ($record) => $record->getId(), $inserted);
 
-    $recordsToRemove = array_map(fn($recordId) => new Record([], $recordId), $insertedIds);
+    $recordsToRemove = array_map(fn ($recordId) => new Record([], $recordId), $insertedIds);
 
     $removed = $client
         ->delete(...$recordsToRemove)
         ->execute()
         ->fetchAll();
 
-    $removedIds = array_map(fn($record) => $record->getId(), $removed);
+    $removedIds = array_map(fn ($record) => $record->getId(), $removed);
 
     expect($removedIds)->toEqual($insertedIds);
 });
 
-it('throws error if no records specified', function() {
+it('throws error if no records specified', function () {
     $client = client()->table('removing');
 
     $removed = $client->delete()->execute();
 })->throws(RecordsNotSpecified::class);
 
-it('cannot remove record without specific record id', function() {
+it('cannot remove record without specific record id', function () {
     $client = client()->table('removing');
 
     $removed = $client
@@ -69,14 +69,14 @@ it('can remove records by string ids', function () {
         ->execute()
         ->fetchAll();
 
-    $insertedIds = array_map(fn($record) => $record->getId(), $inserted);
+    $insertedIds = array_map(fn ($record) => $record->getId(), $inserted);
 
     $removed = $client
         ->delete(...$insertedIds)
         ->execute()
         ->fetchAll();
 
-    $removedIds = array_map(fn($record) => $record->getId(), $removed);
+    $removedIds = array_map(fn ($record) => $record->getId(), $removed);
 
     expect($removedIds)->toEqual($insertedIds);
 });

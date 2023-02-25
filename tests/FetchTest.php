@@ -61,6 +61,6 @@ it('supports zero-limit', function () {
         ->where(['Value' => 'Bar'])
         ->limit(-1)
         ->execute();
-    
+
     expect($recordset->isEmpty())->toBeTrue();
 });

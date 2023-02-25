@@ -7,5 +7,4 @@ namespace Zadorin\Airtable\Errors;
  */
 abstract class ApiError extends AirtableError
 {
-
 }

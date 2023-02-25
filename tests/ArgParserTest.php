@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Zadorin\Airtable\Record;
 use Zadorin\Airtable\ArgParser;
 use Zadorin\Airtable\Errors;
+use Zadorin\Airtable\Record;
 
 it('properly converts mixed set of args', function () {
     $parsed = ArgParser::makeRecordsFromFields(
@@ -12,11 +12,11 @@ it('properly converts mixed set of args', function () {
         new Record(['key2' => 'value2']),
         [
             ['key3' => 'value3'],
-            ['key4' => 'value4']
+            ['key4' => 'value4'],
         ],
         [
             new Record(['key5' => 'value5']),
-            new Record(['key6' => 'value6'])
+            new Record(['key6' => 'value6']),
         ]
     );
 
@@ -60,25 +60,25 @@ it('allows only strings and Record objects when creating records from ids', func
 
 test('isArrayOfArrays() method works properly', function () {
     expect(ArgParser::isArrayOfArrays([
-        'foo' => 'bar'
+        'foo' => 'bar',
     ]))->toBeFalse();
 
     expect(ArgParser::isArrayOfArrays([
-        'foo' => 'bar', 
-        ['baz' => 'qux']
+        'foo' => 'bar',
+        ['baz' => 'qux'],
     ]))->toBeFalse();
 
     expect(ArgParser::isArrayOfArrays([
         ['foo' => 'bar'],
-        'Qux'
+        'Qux',
     ]))->toBeFalse();
 
     expect(ArgParser::isArrayOfArrays([
-        ['foo' => 'bar']
+        ['foo' => 'bar'],
     ]))->toBeTrue();
 
     expect(ArgParser::isArrayOfArrays([
         ['foo' => 'bar'],
-        ['baz' => 'qux']
+        ['baz' => 'qux'],
     ]))->toBeTrue();
 });

@@ -9,14 +9,13 @@ class RequestError extends ApiError
     protected Request $lastRequest;
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param \Throwable $previous
-     * @param Request $lastRequest
+     * @param  string  $message
+     * @param  int  $code
+     * @param  \Throwable  $previous
      */
     public function __construct(Request $lastRequest, $message = 'Request failure', $code = 0, \Throwable $previous = null)
     {
-        $this->lastRequest = $lastRequest;    
+        $this->lastRequest = $lastRequest;
         parent::__construct($message, $code, $previous);
     }
 

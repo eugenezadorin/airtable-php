@@ -15,7 +15,7 @@ it('can fetch records collection', function () {
     expect($recordset->count())->toEqual(2);
 
     $records = $recordset->fetchAll();
-    
+
     expect($records[0])->toBeInstanceOf(Record::class);
     expect($records[0]->getFields()['Name'])->toEqual('Foo');
 

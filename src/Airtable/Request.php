@@ -2,8 +2,6 @@
 
 namespace Zadorin\Airtable;
 
-use Zadorin\Airtable\Errors;
-
 class Request
 {
     protected string $method = 'GET';
@@ -18,7 +16,7 @@ class Request
     protected string $requestBody = '';
 
     protected array $allowedMethods = [
-        'GET', 'POST', 'PUT', 'PATCH', 'DELETE'
+        'GET', 'POST', 'PUT', 'PATCH', 'DELETE',
     ];
 
     protected int $responseCode = 0;
@@ -27,16 +25,14 @@ class Request
 
     protected array $responseInfo = [];
 
-    /** @var ?resource */
-    protected $handler = null;
-
     public function setMethod(string $method): self
     {
         $method = mb_strtoupper($method);
-        if (!in_array($method, $this->allowedMethods)) {
+        if (! in_array($method, $this->allowedMethods)) {
             throw new Errors\MethodNotAllowed('Request method not allowed');
         }
         $this->method = $method;
+
         return $this;
     }
 
@@ -46,30 +42,34 @@ class Request
             throw new Errors\InvalidArgument('Invalid URI');
         }
         $this->uri = $uri;
+
         return $this;
     }
 
     /**
-     * @param array<string, string> $headers
+     * @param  array<string, string>  $headers
      */
     public function setHeaders(array $headers): self
     {
         $this->requestHeaders = $headers;
+
         return $this;
     }
 
     public function setBody(string $body): self
     {
         $this->requestBody = $body;
+
         return $this;
     }
 
     /**
-     * @param mixed $fields
+     * @param  mixed  $fields
      */
     public function setData($fields): self
     {
         $this->requestBody = json_encode($fields, JSON_THROW_ON_ERROR);
+
         return $this;
     }
 
@@ -101,37 +101,38 @@ class Request
         if ($this->responseCode >= 200 && $this->responseCode < 300) {
             return true;
         }
+
         return false;
     }
 
     public function send(): string
     {
-        $this->handler = curl_init($this->uri);
-        curl_setopt($this->handler, CURLOPT_HTTPHEADER, $this->prepareCurlHeaders());
-        curl_setopt($this->handler, CURLINFO_HEADER_OUT, true);
-        curl_setopt($this->handler, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($this->handler, CURLOPT_CUSTOMREQUEST, $this->method);
+        $handler = curl_init($this->uri);
+        curl_setopt($handler, CURLOPT_HTTPHEADER, $this->prepareCurlHeaders());
+        curl_setopt($handler, CURLINFO_HEADER_OUT, true);
+        curl_setopt($handler, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handler, CURLOPT_CUSTOMREQUEST, $this->method);
 
-        if (!empty($this->requestBody)) {
-            curl_setopt($this->handler, CURLOPT_POSTFIELDS, $this->requestBody);
+        if (! empty($this->requestBody)) {
+            curl_setopt($handler, CURLOPT_POSTFIELDS, $this->requestBody);
         }
 
-        $result = curl_exec($this->handler);
-        
-        /** @var array */
-        $this->responseInfo = curl_getinfo($this->handler);
-        
+        $result = curl_exec($handler);
+
+        $this->responseInfo = (array) curl_getinfo($handler);
+
         $this->responseCode = intval($this->responseInfo['http_code']);
-        
+
         if ($result === false) {
-            $errorText = curl_error($this->handler);
-            curl_close($this->handler);
+            $errorText = curl_error($handler);
+            curl_close($handler);
             throw new Errors\RequestError($this, $errorText, $this->responseCode);
         } else {
-            $this->responseBody = (string)$result;
+            $this->responseBody = (string) $result;
         }
 
-        curl_close($this->handler);
+        curl_close($handler);
+
         return $this->responseBody;
     }
 
@@ -144,6 +145,7 @@ class Request
         foreach ($this->requestHeaders as $key => $value) {
             $result[] = "$key: $value";
         }
+
         return $result;
     }
 }

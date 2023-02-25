@@ -8,5 +8,4 @@ namespace Zadorin\Airtable\Errors;
  */
 abstract class PackageError extends AirtableError
 {
-
 }

@@ -16,6 +16,7 @@ class FindQuery extends AbstractQuery
     public function find(Record ...$records): self
     {
         $this->records = $records;
+
         return $this;
     }
 
@@ -27,14 +28,14 @@ class FindQuery extends AbstractQuery
 
         foreach ($this->records as $record) {
             $recordId = $record->getId();
-            if (mb_strlen((string)$recordId) <= 0) {
+            if (mb_strlen((string) $recordId) <= 0) {
                 throw new Errors\RecordsNotSpecified('Record id must be specified');
             }
         }
 
         $records = [];
         foreach ($this->records as $record) {
-            $response = $this->client->call('GET', '/' . (string)$record->getId());
+            $response = $this->client->call('GET', '/'.(string) $record->getId());
             $records[] = Record::createFromResponse($response);
         }
 
