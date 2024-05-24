@@ -64,7 +64,7 @@ final class SelectQuery extends AbstractQuery
         }
 
         return Recordset::createFromResponse(
-            $this->client->call('GET', '?'.http_build_query($urlParams))
+            $this->client->call('POST', '/listRecords', $urlParams)
         );
     }
 
